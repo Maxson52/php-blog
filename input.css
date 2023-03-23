@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .h1 {
+    @apply text-4xl font-bold text-black;
+  }
+
+  .text-input {
+    @apply px-3 py-2 border-2 border-black outline-none rounded-md transition-all focus:outline-none focus:border-purple-600;
+  }
+
+  .button {
+    @apply px-3 py-2 cursor-pointer text-white bg-purple-600 border-2 border-purple-600 rounded-md transition-all hover:-translate-y-0.5;
+  }
+
+  .link {
+    @apply text-purple-600 underline;
+  }
+}
