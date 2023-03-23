@@ -4,7 +4,7 @@ session_start();
 $error = "";
 $userInfo;
 
-require_once('../utils/conn.php');
+require_once('../lib/utils/conn.php');
 
 if (isset($_POST['submit'])) {
     $email = $_POST['email'];
@@ -14,14 +14,14 @@ if (isset($_POST['submit'])) {
     $res = mysqli_query($conn, $matchingEmails) or die("Query failed: " . mysqli_error($conn));
 
     if (mysqli_num_rows($res) == 0) {
-        $error = "Username or password is incorrect";
+        $error = "Email or password is incorrect";
     } else {
         $userInfo = mysqli_fetch_array($res);
         if (password_verify($password, $userInfo['password'])) {
             $_SESSION['user'] = $userInfo;
-            header("Location: index.php");
+            header("Location: ../index.php");
         } else {
-            $error = "Username or password is incorrect";
+            $error = "Email or password is incorrect";
         }
     }
 
