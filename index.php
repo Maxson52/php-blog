@@ -7,6 +7,12 @@ if (!isset($_SESSION['user'])) {
   header("Location: ./auth/log-in.php");
 }
 
+// Get all articles
+require_once('./lib/utils/conn.php');
+
+$query = "SELECT posts.id, posts.title, posts.created_at, users.name AS author FROM posts JOIN users ON posts.author_id = users.id ORDER BY posts.created_at DESC";
+$res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
+
 ?>
 
 <html>
@@ -14,7 +20,7 @@ if (!isset($_SESSION['user'])) {
 <head>
   <title>Fry Me to the Moon</title>
   <link rel="icon" href="./lib/assets/strawberry.png" />
-  <link href="./output.css" rel="stylesheet" />
+  <link href="./lib/css/output.css" rel="stylesheet" />
 </head>
 
 
@@ -26,17 +32,38 @@ if (!isset($_SESSION['user'])) {
     </div>
     <div class="flex space-x-8">
       <?php if ($_SESSION['user']['role'] === 'admin') echo
-      "<a href='./admin-dashboard'>Admin Dashboard</a>" ?>
+      "<a href='./admin'>Admin Panel</a>" ?>
       <a href="./auth/log-out.php">Log out</a>
     </div>
   </nav>
   <!-- NAV END -->
 
-  <!-- ARTICLES START -->
+  <section class="grid w-full place-items-center">
+    <div class="flex flex-col w-full gap-2 p-8">
 
+      <!-- CREATE ARTICLE START -->
+      <a href="./create" class="mb-2 w-fit button">Write your own article</a>
+      <!-- CREATE ARTICLE END -->
 
+      <!-- LIST ARTICLES START -->
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <?php
+        while ($row = mysqli_fetch_array($res)) {
+          $date = date('M d, Y', strtotime($row['created_at']));
+          echo "
+          <a href='./post?id=" . $row['id'] . "' class='flex flex-col gap-2 p-4 transition border rounded-lg shadow-md hover:shadow-lg'>
+            <h2 class='link'>" . $row['title'] . "</h2>
+            <p class='text-gray-400'>By " . $row['author'] . " on " . $date . "</p>
+          </a>
+          ";
+        }
+        ?>
+      </div>
+      <!-- LIST ARTICLES END -->
 
-  <!-- ARTICLES END -->
+    </div>
+  </section>
+
 </body>
 
 </html>

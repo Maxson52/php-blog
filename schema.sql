@@ -10,7 +10,7 @@ CREATE TABLE `posts`(
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `title` VARCHAR(255) NOT NULL,
     `content` TEXT NOT NULL,
-    `category` ENUM('recipe', 'review', 'advice'),
+    `category` ENUM('recipe', 'review', 'advice','other') NOT NULL DEFAULT 'other',
     `created_at` DATETIME NULL,
     `author_id` INT NOT NULL
 );

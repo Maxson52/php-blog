@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+// If authed redirect to login page
+if (isset($_SESSION['user'])) {
+    header("Location: ../");
+}
+
 $error = "";
 $userInfo;
 
@@ -19,7 +24,7 @@ if (isset($_POST['submit'])) {
         $userInfo = mysqli_fetch_array($res);
         if (password_verify($password, $userInfo['password'])) {
             $_SESSION['user'] = $userInfo;
-            header("Location: ../index.php");
+            header("Location: ../");
         } else {
             $error = "Email or password is incorrect";
         }
@@ -32,7 +37,8 @@ if (isset($_POST['submit'])) {
 
 <head>
     <title>Log in</title>
-    <link href="../output.css" rel="stylesheet" />
+    <link rel="icon" href="../lib/assets/strawberry.png" />
+    <link href="../lib/css/output.css" rel="stylesheet" />
 </head>
 
 <body>

@@ -1,15 +1,20 @@
 <?php
 session_start();
 
+// If authed redirect to login page
+if (isset($_SESSION['user'])) {
+    header("Location: ../");
+}
+
 $error = "";
 $userInfo;
 
 require_once('../lib/utils/conn.php');
 
 if (isset($_POST['submit'])) {
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
 
     $matchingEmails = "SELECT * FROM `users` WHERE `email`='$email'";
     $res = mysqli_query($conn, $matchingEmails) or die("Query failed: " . mysqli_error($conn));
@@ -33,7 +38,8 @@ if (isset($_POST['submit'])) {
 
 <head>
     <title>Create account</title>
-    <link href="../output.css" rel="stylesheet" />
+    <link rel="icon" href="../lib/assets/strawberry.png" />
+    <link href="../lib/css/output.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -49,7 +55,7 @@ if (isset($_POST['submit'])) {
 
                 <input class="text-input" type="email" name="email" placeholder="Enter your email" required>
 
-                <input class="text-input bg-orange-50" type="password" name="password" placeholder="Enter your password" required>
+                <input class="text-input" type="password" name="password" placeholder="Enter your password" required>
 
                 <input class="button" type="submit" name="submit" value="Create account" />
             </form>
