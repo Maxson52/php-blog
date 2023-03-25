@@ -419,6 +419,13 @@ video {
   display: none;
 }
 
+hr {
+  width: 100%;
+  border-width: 1px;
+  --tw-border-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity));
+}
+
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -651,12 +658,30 @@ video {
   margin-bottom: 3rem;
 }
 
+.mx-4 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.mx-12 {
+  margin-left: 3rem;
+  margin-right: 3rem;
+}
+
 .mb-2 {
   margin-bottom: 0.5rem;
 }
 
+.mt-12 {
+  margin-top: 3rem;
+}
+
 .mt-24 {
   margin-top: 6rem;
+}
+
+.mb-12 {
+  margin-bottom: 3rem;
 }
 
 .flex {
