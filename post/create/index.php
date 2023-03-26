@@ -26,7 +26,7 @@ if (isset($_POST['submit'])) {
     $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
     // Redirect to home
-    header("Location: ../");
+    header("Location: ../../");
 }
 
 ?>

@@ -43,34 +43,9 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
         <div class="flex flex-col gap-2 mt-24 min-w-[50%] max-w-6xl">
             <h1 class="h1">Admin Panel</h1>
 
-            <table class="table-auto">
-                <thead class="text-left">
-                    <tr>
-                        <th class="px-4 py-2">Name</th>
-                        <th class="px-4 py-2">Email</th>
-                        <th class="px-4 py-2">Role</th>
-                        <th class="px-4 py-2">Edit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    while ($row = mysqli_fetch_assoc($res)) {
-                        $name = $row['name'];
-                        $email = $row['email'];
-                        $role = $row['role'];
-                        $id = $row['id'];
-
-
-                        echo "<tr" . ($id === $_SESSION['user']['id'] ? " class='bg-gray-200' "  : '') . ">" .
-                            "<td class='px-4 py-2 border'>$name</td>
-                        <td class='px-4 py-2 border'>$email</td>
-                        <td class='px-4 py-2 border'>$role</td>
-                        <td class='px-4 py-2 border'><a href='edit?id=$id'>Edit</a></td>
-                        </tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
+            <a href="users" class="link">Manage Users</a>
+            <a href="posts" class="link">Manage Posts</a>
+            <a href="comments" class="link">Manage Comments</a>
         </div>
     </div>
 

@@ -4,7 +4,7 @@ session_start();
 
 // If not authed redirect to login page
 if (!isset($_SESSION['user'])) {
-    header("Location: ../../auth/log-in.php");
+    header("Location: ../../../auth/log-in.php");
 }
 
 // If no id set redirect to admin page
@@ -15,7 +15,7 @@ if (!isset($_GET['id'])) {
 $error = "";
 
 // Get user from DB
-require_once('../../lib/utils/conn.php');
+require_once('../../../lib/utils/conn.php');
 
 $query = "SELECT * FROM users WHERE id = " . $_GET['id'];
 $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
@@ -26,8 +26,6 @@ if (isset($_POST['submit'])) {
     $name = $_POST['name'];
     $email = $_POST['email'];
     $role = $_POST['role'];
-
-    echo $uid;
 
     $query = "UPDATE users SET name = '$name', email = '$email', role = '$role' WHERE id = " . $_GET['id'];
     $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
@@ -41,8 +39,8 @@ if (isset($_POST['submit'])) {
 
 <head>
     <title>Fry Me to the Moon</title>
-    <link rel="icon" href="../../lib/assets/strawberry.png" />
-    <link href="../../lib/css/output.css" rel="stylesheet" />
+    <link rel="icon" href="../../../lib/assets/strawberry.png" />
+    <link href="../../../lib/css/output.css" rel="stylesheet" />
 </head>
 
 
@@ -54,7 +52,7 @@ if (isset($_POST['submit'])) {
         </div>
         <div class="flex space-x-8">
             <a href="../">Back</a>
-            <a href="../../auth/log-out.php">Log out</a>
+            <a href="../../../auth/log-out.php">Log out</a>
         </div>
     </nav>
     <!-- NAV END -->

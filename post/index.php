@@ -18,11 +18,24 @@ require_once('../lib/utils/conn.php');
 $id = $_GET['id'];
 
 // Get post
-$query = "SELECT posts.id, posts.title, posts.content, posts.created_at, users.name FROM posts JOIN users ON posts.author_id = users.id WHERE posts.id = $id";
+$query = "SELECT posts.id, posts.title, posts.content, posts.created_at, users.name FROM posts 
+            JOIN users ON posts.author_id = users.id 
+            WHERE posts.id = $id
+            AND posts.visible = 1
+            ";
 $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
+// Redirect if no post
+if (mysqli_num_rows($res) == 0) {
+    header("Location: ../");
+}
+
 // Get comments
-$commentsQuery = "SELECT comments.id, comments.content, comments.created_at, users.name FROM comments JOIN users ON comments.author_id = users.id WHERE comments.post_id = $id ORDER BY comments.created_at ASC";
+$commentsQuery = "SELECT comments.id, comments.content, comments.created_at, users.name FROM comments 
+                JOIN users ON comments.author_id = users.id 
+                WHERE comments.post_id = $id 
+                AND comments.visible = 1
+                ORDER BY comments.created_at ASC";
 $comments = mysqli_query($conn, $commentsQuery) or die("Query failed: " . mysqli_error($conn));
 
 // Create comment
