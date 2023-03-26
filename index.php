@@ -10,7 +10,27 @@ if (!isset($_SESSION['user'])) {
 // Get all articles
 require_once('./lib/utils/conn.php');
 
-$query = "SELECT posts.id, posts.title, posts.created_at, users.name AS author FROM posts JOIN users ON posts.author_id = users.id WHERE posts.visible = 1 ORDER BY posts.created_at DESC";
+if (isset($_GET['category'])) {
+  $category = $_GET['category'];
+
+  if (!is_numeric($category)) {
+    header("Location: ./");
+  }
+
+  $query = "SELECT posts.id, posts.title, posts.created_at, users.name AS author, categories.name AS category FROM posts 
+            JOIN users ON posts.author_id = users.id 
+            JOIN categories ON posts.category_id = categories.id
+            WHERE posts.visible = 1 
+            AND posts.category_id = $category
+            ORDER BY posts.created_at DESC";
+} else {
+  $query = "SELECT posts.id, posts.title, posts.created_at, users.name AS author, categories.name AS category FROM posts 
+            JOIN users ON posts.author_id = users.id 
+            JOIN categories ON posts.category_id = categories.id
+            WHERE posts.visible = 1 
+            ORDER BY posts.created_at DESC";
+}
+
 $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
 ?>
@@ -42,21 +62,41 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
     <div class="flex flex-col w-full gap-2 p-8">
 
       <!-- TOP BAR START -->
-      <div class="flex justify-between">
+      <div class="flex flex-col gap-2 md:items-center md:justify-between md:flex-row">
         <h1 class="h1">Articles</h1>
+
+        <!-- FILTER START -->
+        <form action="./" method="GET" class="flex gap-2">
+          <label for="category" class="flex items-center">Filter by category:</label>
+          <select name="category" id="category" class="select-input">
+            <option value="">All</option>
+            <?php
+            $query = "SELECT * FROM categories";
+            $cats = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
+            while ($row = mysqli_fetch_array($cats)) {
+              echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
+            }
+            ?>
+          </select>
+          <button type="submit" class="button">Filter</button>
+        </form>
+        <!-- FILTER END -->
+
         <a href="./post/create" class="mb-2 w-fit button">Write your own article</a>
       </div>
       <!-- TOP BAR END -->
 
       <!-- LIST ARTICLES START -->
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <?php
         while ($row = mysqli_fetch_array($res)) {
           $date = date('M d, Y', strtotime($row['created_at']));
           echo "
           <a href='./post?id=" . $row['id'] . "' class='flex flex-col gap-2 p-4 transition border rounded-lg shadow-md hover:shadow-lg'>
-            <h2 class='link'>" . $row['title'] . "</h2>
-            <p class='text-gray-400'>By " . $row['author'] . " on " . $date . "</p>
+            <div class='flex gap-2'>
+              <h2 class='link'>" . $row['title'] . "</h2><span class='text-gray-400'> (" . $row['category'] . ")</span>
+            </div>
+            <p>By " . $row['author'] . " on " . $date . "</p>
           </a>
           ";
         }

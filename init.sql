@@ -10,7 +10,9 @@ INSERT INTO `categories` (`name`)
 VALUES
     ('Technology'),
     ('Sports'),
-    ('Entertainment');
+    ('Entertainment'),
+    ('Other')
+    ;
 
 -- Create posts
 INSERT INTO `posts` (`title`, `content`, `category_id`, `author_id`)

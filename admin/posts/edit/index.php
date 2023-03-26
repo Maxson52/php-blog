@@ -21,16 +21,21 @@ $query = "SELECT * FROM posts WHERE id = " . $_GET['id'];
 $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 extract(mysqli_fetch_array($res));
 
+// Get cats
+$query = "SELECT * FROM categories";
+$cats = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
+
 // If form submitted
 if (isset($_POST['submit'])) {
     $newTitle = $_POST['title'];
     $newContent = $_POST['content'];
     $newVisibility = $_POST['visibility'];
+    $newCategory = $_POST['category'];
 
     $escapedTitle = mysqli_real_escape_string($conn, $newTitle);
     $escapedContent = mysqli_real_escape_string($conn, $newContent);
 
-    $query = "UPDATE posts SET title = '$escapedTitle', content = '$escapedContent', visible = $newVisibility WHERE id = " . $_GET['id'];
+    $query = "UPDATE posts SET title = '$escapedTitle', content = '$escapedContent', visible = '$newVisibility', category_id = '$newCategory' WHERE id = " . $_GET['id'];
     $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
     if ($res) {
@@ -76,9 +81,17 @@ if (isset($_POST['submit'])) {
             <form action="<?php echo $_SERVER['PHP_SELF'] . "?id=" . $_GET['id'] ?>" method="POST" class="flex flex-col gap-2">
                 <input class="text-input" type="text" name="title" placeholder="Enter title" value="<?php echo $title ?>" required>
 
+                <!-- Visibility -->
                 <select class="select-input" name="visibility" id="visibility">
-                    <option value="true" <?php if ($visible) echo "selected" ?>>Visible</option>
-                    <option value="false" <?php if (!$visible) echo "selected" ?>>Hidden</option>
+                    <option value="1" <?php if ($visible) echo "selected" ?>>Visible</option>
+                    <option value="0" <?php if (!$visible) echo "selected" ?>>Hidden</option>
+                </select>
+
+                <!-- Category -->
+                <select class="select-input" name="category" id="category">
+                    <?php while ($cat = mysqli_fetch_array($cats)) { ?>
+                        <option value="<?php echo $cat['id'] ?>" <?php if ($cat['id'] == $category_id) echo "selected" ?>><?php echo $cat['name'] ?></option>
+                    <?php } ?>
                 </select>
 
                 <textarea id="editor" name="content"><?php echo $content ?></textarea>

@@ -727,6 +727,10 @@ hr {
   place-items: center;
 }
 
+.items-center {
+  align-items: center;
+}
+
 .justify-center {
   justify-content: center;
 }
@@ -825,6 +829,10 @@ hr {
   text-align: center;
 }
 
+.align-middle {
+  vertical-align: middle;
+}
+
 .text-5xl {
   font-size: 3rem;
   line-height: 1;
@@ -852,6 +860,15 @@ hr {
 .text-red-500 {
   --tw-text-opacity: 1;
   color: rgb(239 68 68 / var(--tw-text-opacity));
+}
+
+.text-gray-600 {
+  --tw-text-opacity: 1;
+  color: rgb(75 85 99 / var(--tw-text-opacity));
+}
+
+.no-underline {
+  text-decoration-line: none;
 }
 
 .shadow-md {
@@ -882,6 +899,18 @@ hr {
 @media (min-width: 768px) {
   .md\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .md\:flex-row {
+    flex-direction: row;
+  }
+
+  .md\:items-center {
+    align-items: center;
+  }
+
+  .md\:justify-between {
+    justify-content: space-between;
   }
 }
 

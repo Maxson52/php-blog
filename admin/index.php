@@ -46,6 +46,7 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
             <a href="users" class="link">Manage Users</a>
             <a href="posts" class="link">Manage Posts</a>
             <a href="comments" class="link">Manage Comments</a>
+            <a href="categories" class="link">Manage Categories</a>
         </div>
     </div>
 

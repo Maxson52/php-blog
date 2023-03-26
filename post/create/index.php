@@ -9,7 +9,11 @@ if (!isset($_SESSION['user'])) {
 
 $error = "";
 
-require_once('../lib/utils/conn.php');
+require_once('../../lib/utils/conn.php');
+
+// Get categories
+$query = "SELECT * FROM categories";
+$cats = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
 // On form submit
 if (isset($_POST['submit'])) {
@@ -17,12 +21,13 @@ if (isset($_POST['submit'])) {
     $title = $_POST['title'];
     $content = $_POST['content'];
     $author_id = $_SESSION['user']['id'];
+    $category_id = $_POST['category'];
 
     $escapedTitle = mysqli_real_escape_string($conn, $title);
     $escapedContent = mysqli_real_escape_string($conn, $content);
 
     // Insert into db
-    $query = "INSERT INTO posts (title, content, author_id) VALUES ('$escapedTitle', '$escapedContent', '$author_id')";
+    $query = "INSERT INTO posts (title, content, author_id, category_id) VALUES ('$escapedTitle', '$escapedContent', '$author_id', '$category_id')";
     $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
     // Redirect to home
@@ -35,8 +40,8 @@ if (isset($_POST['submit'])) {
 
 <head>
     <title>Fry Me to the Moon</title>
-    <link rel="icon" href="../lib/assets/strawberry.png" />
-    <link href="../lib/css/output.css" rel="stylesheet" />
+    <link rel="icon" href="../../lib/assets/strawberry.png" />
+    <link href="../../lib/css/output.css" rel="stylesheet" />
 </head>
 
 
@@ -48,7 +53,7 @@ if (isset($_POST['submit'])) {
         </div>
         <div class="flex space-x-8">
             <a href="../">Back</a>
-            <a href="../auth/log-out.php">Log out</a>
+            <a href="../../auth/log-out.php">Log out</a>
         </div>
     </nav>
     <!-- NAV END -->
@@ -63,6 +68,16 @@ if (isset($_POST['submit'])) {
 
             <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" class="flex flex-col gap-2">
                 <input type="text" name="title" placeholder="What're you calling this post?" class="text-input" required minlength="3">
+
+                <!-- Category select -->
+                <select name="category" class="text-input" required>
+                    <option value="" disabled selected>Select a category</option>
+                    <?php
+                    while ($row = mysqli_fetch_array($cats)) {
+                        echo "<option value='$row[id]'>$row[name]</option>";
+                    }
+                    ?>
+                </select>
 
 
                 <textarea id="editor" name="content">Write your family's greatest recipe, your thoughts on poutine, or anything else on your mind.</textarea>
