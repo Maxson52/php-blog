@@ -54,6 +54,8 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
     <div class="flex space-x-8">
       <?php if ($_SESSION['user']['role'] === 'admin') echo
       "<a href='./admin'>Admin Panel</a>" ?>
+      <?php if ($_SESSION['user']['role'] === 'user') echo
+      "<a href='./user'>Account</a>" ?>
       <a href="./auth/log-out.php">Log out</a>
     </div>
   </nav>
