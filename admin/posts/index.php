@@ -7,6 +7,11 @@ if (!isset($_SESSION['user'])) {
     header("Location: ../../auth/log-in.php");
 }
 
+// If not admin redirect to home
+if ($_SESSION['user']['role'] !== 'admin') {
+    header("Location: ../../");
+}
+
 // Get all posts from DB
 require_once('../../lib/utils/conn.php');
 

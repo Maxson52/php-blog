@@ -27,7 +27,8 @@ CREATE TABLE `comments`(
 
 CREATE TABLE `categories`(
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `name` VARCHAR(33) NOT NULL
+    `name` VARCHAR(33) NOT NULL,
+    `visible` BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 

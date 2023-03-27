@@ -7,32 +7,22 @@ if (!isset($_SESSION['user'])) {
     header("Location: ../../../auth/log-in.php");
 }
 
+// If not admin redirect to home
 if ($_SESSION['user']['role'] !== 'admin') {
     header("Location: ../../../");
 }
 
-// If no id set redirect to admin page
-if (!isset($_GET['id'])) {
-    header("Location: ../");
-}
-
 $error = "";
 
-// Get cat from DB
 require_once('../../../lib/utils/conn.php');
-
-$query = "SELECT * FROM categories WHERE id = " . $_GET['id'];
-$res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
-extract(mysqli_fetch_array($res));
 
 // If form submitted
 if (isset($_POST['submit'])) {
-    $newName = $_POST['category'];
-    $newVisibility = $_POST['visibility'];
+    $cat = $_POST['category'];
 
-    $escapedName = mysqli_real_escape_string($conn, $newName);
+    $escapedCat = mysqli_real_escape_string($conn, $cat);
 
-    $query = "UPDATE categories SET name = '$escapedName', visible = '$newVisibility' WHERE id = " . $_GET['id'];
+    $query = "INSERT INTO categories (name) VALUES ('$escapedCat')";
     $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
     if ($res) {
@@ -66,27 +56,21 @@ if (isset($_POST['submit'])) {
     </nav>
     <!-- NAV END -->
 
-    <!-- EDIT CAT START -->
+    <!-- Create CAT START -->
     <div class="grid place-items-center">
         <div class="flex flex-col gap-2 mt-24 min-w-[50%] max-w-6xl">
-            <h1 class="h1">Edit category</h1>
+            <h1 class="h1">Create category</h1>
 
             <p class="text-red-500"><?php echo $error ?></p>
 
-            <form action="<?php echo $_SERVER['PHP_SELF'] . "?id=" . $_GET['id'] ?>" method="POST" class="flex flex-col gap-2">
-                <!-- Visibility -->
-                <select class="select-input" name="visibility" id="visibility">
-                    <option value="1" <?php if ($visible) echo "selected" ?>>Visible</option>
-                    <option value="0" <?php if (!$visible) echo "selected" ?>>Hidden</option>
-                </select>
+            <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" class="flex flex-col gap-2">
+                <input class="text-input" type="text" name="category" placeholder="Enter category">
 
-                <input class="text-input" type="text" name="category" placeholder="Enter category" value="<?= $name ?>">
-
-                <input class="button" type="submit" name="submit" value="Update category" />
+                <input class="button" type="submit" name="submit" value="Create category" />
             </form>
         </div>
     </div>
-    <!-- EDIT CAT END -->
+    <!-- Create CAT END -->
 </body>
 
 </html>

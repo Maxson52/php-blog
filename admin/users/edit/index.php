@@ -7,6 +7,11 @@ if (!isset($_SESSION['user'])) {
     header("Location: ../../../auth/log-in.php");
 }
 
+// If not admin redirect to home
+if ($_SESSION['user']['role'] !== 'admin') {
+    header("Location: ../../../");
+}
+
 // If no id set redirect to admin page
 if (!isset($_GET['id'])) {
     header("Location: ../");

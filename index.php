@@ -22,9 +22,10 @@ if (isset($_GET['category'])) {
             JOIN categories ON posts.category_id = categories.id
             WHERE posts.visible = 1 
             AND posts.category_id = $category
+            AND categories.visible = 1
             ORDER BY posts.created_at DESC";
 } else {
-  $query = "SELECT posts.id, posts.title, posts.created_at, users.name AS author, categories.name AS category FROM posts 
+  $query = "SELECT posts.id, posts.title, posts.created_at, users.name AS author, categories.name AS category, categories.visible FROM posts 
             JOIN users ON posts.author_id = users.id 
             JOIN categories ON posts.category_id = categories.id
             WHERE posts.visible = 1 
@@ -71,8 +72,8 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
           <select name="category" id="category" class="select-input">
             <option value="">All</option>
             <?php
-            $query = "SELECT * FROM categories";
-            $cats = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
+            $catsQuery = "SELECT * FROM categories WHERE visible = 1";
+            $cats = mysqli_query($conn, $catsQuery) or die("Query failed: " . mysqli_error($conn));
             while ($row = mysqli_fetch_array($cats)) {
               echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
             }
@@ -91,14 +92,19 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
         <?php
         while ($row = mysqli_fetch_array($res)) {
           $date = date('M d, Y', strtotime($row['created_at']));
+
           echo "
           <a href='./post?id=" . $row['id'] . "' class='flex flex-col gap-2 p-4 transition border rounded-lg shadow-md hover:shadow-lg'>
             <div class='flex gap-2'>
-              <h2 class='link'>" . $row['title'] . "</h2><span class='text-gray-400'> (" . $row['category'] . ")</span>
+              <h2 class='link'>" . $row['title'] . "</h2><span class='text-gray-400'>" . ($row['visible'] ? "(" . $row['category'] . ")" : "") . "</span>
             </div>
             <p>By " . $row['author'] . " on " . $date . "</p>
           </a>
           ";
+        }
+
+        if (mysqli_num_rows($res) === 0) {
+          echo "<p class='text-gray-400'>No articles found.</p>";
         }
         ?>
       </div>

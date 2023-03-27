@@ -7,6 +7,11 @@ if (!isset($_SESSION['user'])) {
     header("Location: ../../auth/log-in.php");
 }
 
+// If not admin redirect to home
+if ($_SESSION['user']['role'] !== 'admin') {
+    header("Location: ../../");
+}
+
 // Get all cats from DB
 require_once('../../lib/utils/conn.php');
 
@@ -43,10 +48,13 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
         <div class="flex flex-col gap-2 mt-24 min-w-[50%] max-w-6xl">
             <h1 class="h1">Admin Panel - Manage Categories</h1>
 
+            <a href="create" class="mb-2 w-fit button">Create new category</a>
+
             <table class="table-auto">
                 <thead class="text-left">
                     <tr>
                         <th class="px-4 py-2">Name</th>
+                        <th class="px-4 py-2">Visibility</th>
                         <th class="px-4 py-2">Edit</th>
                     </tr>
                 </thead>
@@ -54,10 +62,12 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
                     <?php
                     while ($row = mysqli_fetch_array($res)) {
                         $name = $row['name'];
+                        $visible = $row['visible'] ? "Visible" : "Hidden";
                         $id = $row['id'];
 
                         echo "<tr>
                         <td class='px-4 py-2 border'>$name</td>
+                        <td class='px-4 py-2 border'>$visible</td>
                         <td class='px-4 py-2 border'><a class='link' href='edit?id=$id'>Edit</a></td>
                         </tr>";
                     }
