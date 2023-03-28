@@ -12,13 +12,14 @@ require_once('../lib/utils/conn.php');
 
 $uid = $_SESSION['user']['id'];
 
-$query = "SELECT users.id, users.name, users.email, posts.title, comments.content 
-          FROM users 
-          JOIN posts ON users.id = posts.author_id 
-          JOIN comments ON users.id = comments.author_id 
-          WHERE users.id = $uid";
+$query = "SELECT users.id, users.name, users.email, comments.content AS comments 
+            FROM users
+            JOIN comments on users.id = comments.author_id
+            WHERE users.id = $uid";
 $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
+$row = mysqli_fetch_assoc($res);
+$comments = mysqli_fetch_all($res);
 ?>
 
 <html>
@@ -49,30 +50,24 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
             <h1 class="h1">Account</h1>
 
             <!-- Display user name and email -->
-            <?php
-            if (mysqli_num_rows($res) > 0) {
-                // NOT A LOOP
-                while ($row = mysqli_fetch_assoc($res)) {
-                    $name = $row['name'];
-                    $email = $row['email'];
+            <div class="flex justify-center gap-2 h3">
+                <p><?php echo $row['name'] ?></p>
+                -
+                <p><?php echo $row['email'] ?></p>
+            </div>
 
-            ?>
-
-                    <div class="flex justify-center gap-2">
-                        <p class="text-gray-500"><?php echo $name ?></p>
-                        -
-                        <p class="text-gray-500"><?php echo $email ?></p>
+            <!-- List all comments -->
+            <div class="flex flex-col gap-2">
+                <?php foreach ($comments as $comment) : ?>
+                    <div class="flex flex-col w-full gap-2 p-4 transition border rounded-lg shadow-md">
+                        <?php echo $comment[3] ?>
                     </div>
+                <?php endforeach; ?>
 
-            <?php
-                }
-            } else {
-                echo "No user found";
-            }
-            ?>
+
+            </div>
         </div>
-    </div>
-    <!-- ACCOUNT END -->
+        <!-- ACCOUNT END -->
 </body>
 
 </html>
