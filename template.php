@@ -38,7 +38,7 @@ if (!isset($_SESSION['user'])) {
 
     <!-- EDIT USER START -->
     <div class="grid place-items-center">
-        <div class="flex flex-col gap-2 mt-24 min-w-[50%] max-w-6xl">
+        <div class="flex flex-col gap-2 mt-24 p-8 min-w-[50%] max-w-6xl">
             <h1 class="h1">Stuff</h1>
         </div>
     </div>
