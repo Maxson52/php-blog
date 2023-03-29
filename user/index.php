@@ -17,7 +17,9 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
 $row = mysqli_fetch_assoc($res);
 
 // Get all posts
-$postQuery = "SELECT *, categories.name AS category FROM posts JOIN categories ON posts.category_id = categories.id WHERE author_id = $uid";
+$postQuery = "SELECT posts.id, posts.title, posts.content, posts.created_at, categories.name AS category, categories.visible AS cat_visible FROM posts 
+            JOIN categories ON posts.category_id = categories.id 
+            WHERE author_id = $uid";
 $posts = mysqli_query($conn, $postQuery) or die("Query failed: " . mysqli_error($conn));
 
 // Get all comments
@@ -53,7 +55,7 @@ $comments = mysqli_query($conn, $commentQuery) or die("Query failed: " . mysqli_
 
             <!-- Display user name and email -->
             <div class="flex flex-col gap-3 mb-4">
-                <img src='https://source.boringavatars.com/beam?name=$row[id]' class='h-20 rounded-full w-min' />
+                <img src='https://source.boringavatars.com/beam?name=<?= $row['id'] ?>' class='h-20 rounded-full w-min' />
 
                 <h1 class="h1"><?php echo $row['name'] ?></h1>
 
@@ -69,7 +71,7 @@ $comments = mysqli_query($conn, $commentQuery) or die("Query failed: " . mysqli_
                             <h2 class='h2'><?= $post['title'] ?></h2>
                             <p class='pb-4'><?= strip_tags(substr($post['content'], 0, 100)) ?>...</p>
                             <div class='flex items-center gap-2 text-sm'>
-                                <p class='px-3 py-1 bg-gray-100 rounded-full w-min'><?= ($post['visible'] ? $post['category'] : "") ?></p>
+                                <?php if ($post['cat_visible']) echo "<p class='px-3 py-1 bg-gray-100 rounded-full w-min'>" . $post['category'] . "</p>" ?>
                             </div>
                         </a>
 
