@@ -18,7 +18,7 @@ require_once('../lib/utils/conn.php');
 $id = $_GET['id'];
 
 // Get post
-$query = "SELECT posts.id, posts.title, posts.content, posts.created_at, users.name FROM posts 
+$query = "SELECT posts.id, posts.title, posts.content, posts.created_at, posts.author_id, users.name FROM posts 
             JOIN users ON posts.author_id = users.id 
             WHERE posts.id = $id
             AND posts.visible = 1
@@ -88,104 +88,101 @@ if (isset($_POST['submit'])) {
     <div class="grid place-items-center">
         <!--  ARTICLE START -->
         <article class="flex flex-col gap-2 mt-24 min-w-[50%] max-w-6xl px-8">
+            <?php foreach ($res as $row) : ?>
+                <?php
+                $title = $row['title'];
+                $content = $row['content'];
+                $author = $row['name'];
+                $date = date('M d, Y', strtotime($row['created_at'])); ?>
 
+                <h1 class="text-5xl font-medium text-center"><?= $title ?></h1>
+                <div class="flex justify-center gap-2">
+                    <p class="text-gray-500"><?= $author ?></p>
+                    -
+                    <p class="text-gray-500"><?= $date ?></p>
+
+                    <?php if ($_SESSION['user']['id'] == $row['author_id'] || $_SESSION['user']['role'] == 'admin') : ?>
+                        <span class="text-gray-400">- </span><a href="../post/edit?id=<?= $row['id'] ?>" class="link">Edit Post</a>
+                    <?php endif; ?>
+                </div>
+                <div class="my-12 prose" id="content"><?= $content ?></div>
+                <style>
+                    #content {
+                        max-width: none;
+                    }
+                </style>
+            <?php endforeach; ?>
             <?php
-            if (mysqli_num_rows($res) > 0) {
-                while ($row = mysqli_fetch_assoc($res)) {
-                    $title = $row['title'];
-                    $content = $row['content'];
-                    $author = $row['name'];
-                    $date = date('M d, Y', strtotime($row['created_at']));
-            ?>
-
-                    <h1 class="text-5xl font-medium text-center"><?php echo $title ?></h1>
-                    <div class="flex justify-center gap-2">
-                        <p class="text-gray-500"><?php echo $author ?></p>
-                        -
-                        <p class="text-gray-500"><?php echo $date ?></p>
-                    </div>
-                    <div class="my-12 prose" id="content"><?php echo $content ?></div>
-                    <style>
-                        #content {
-                            max-width: none;
-                        }
-                    </style>
-
-            <?php
-                }
-            } else {
-                echo "No post found";
+            if (mysqli_num_rows($res) === 0) {
+                echo "<p class='text-gray-400'>No post found.</p>";
             }
             ?>
-
-            <hr>
         </article>
         <!-- ARTICLE END -->
 
         <!-- COMMENTS START -->
-        <div class="flex flex-col gap-2 my-12 min-w-[50%] max-w-6xl px-8">
-            <?php
-            if (mysqli_num_rows($comments) > 0) {
-                while ($row = mysqli_fetch_array($comments)) {
-                    $comment = $row['content'];
-                    $author = $row['name'];
-                    $date = date('M d, Y - g:i', strtotime($row['created_at']));
+        <div class="flex flex-col gap-2 min-w-[50%] max-w-6xl px-8">
+            <h2 class="pb-4 border-b h2">Comments</h2>
+            <div class="flex flex-col gap-2">
+                <?php foreach ($comments as $comment) : ?>
+                    <?php
+                    $content = $comment['content'];
+                    $author = $comment['name'];
+                    $date = date('M d, Y - g:i', strtotime($comment['created_at']));
+                    ?>
 
-            ?>
-
-                    <div class="flex flex-col w-full gap-2 p-4 transition border rounded-lg shadow-md">
+                    <div class="flex flex-col w-full gap-2 p-4 transition border-b ">
                         <h3 class="h3"><?php echo $author ?></h3>
                         <p class="text-gray-500"><?php echo $date ?></p>
-                        <p class="prose"><?php echo $comment ?></p>
+                        <p class="prose"><?php echo $content ?></p>
                     </div>
-
-            <?php
+                <?php endforeach; ?>
+                <?php
+                if (mysqli_num_rows($comments) === 0) {
+                    echo "<p class='text-gray-400'>No comments yet.</p>";
                 }
-            } else {
-                echo "No comments yet!";
-            }
-            ?>
-        </div>
-        <!-- COMMENTS END -->
-
-
-        <!-- COMMENT FORM START -->
-
-        <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
-
-        <div class="grid place-items-center">
-            <div class="flex flex-col gap-2 mb-12 min-w-[50%] max-w-6xl">
-                <p class="text-red-500"><?php echo $error ?></p>
-
-
-                <form action="<?php echo $_SERVER['PHP_SELF'] . "?id=" . $_GET['id'] ?>" method="POST" class="flex flex-col gap-2">
-                    <textarea id="editor" name="content" placeholder="Write your comment..."></textarea>
-                    <script>
-                        ClassicEditor
-                            .create(document.querySelector('#editor'))
-                            .then(editor => {
-                                console.log(editor);
-                            })
-                            .catch(error => {
-                                console.error(error);
-                            });
-                    </script>
-
-                    <style>
-                        .ck-editor__editable_inline {
-                            padding: 0 30px !important;
-                        }
-                    </style>
-
-                    <input class="button" type="submit" name="submit" value="Comment" />
-                </form>
+                ?>
             </div>
+            <!-- COMMENTS END -->
+
+
+            <!-- COMMENT FORM START -->
+
+            <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
+
+            <div class="grid place-items-center">
+                <div class="flex flex-col gap-2 mb-12 min-w-[50%] max-w-6xl">
+                    <p class="text-red-500"><?php echo $error ?></p>
+
+
+                    <form action="<?php echo $_SERVER['PHP_SELF'] . "?id=" . $_GET['id'] ?>" method="POST" class="flex flex-col gap-2">
+                        <textarea id="editor" name="content" placeholder="Write your comment..."></textarea>
+                        <script>
+                            ClassicEditor
+                                .create(document.querySelector('#editor'))
+                                .then(editor => {
+                                    console.log(editor);
+                                })
+                                .catch(error => {
+                                    console.error(error);
+                                });
+                        </script>
+
+                        <style>
+                            .ck-editor__editable_inline {
+                                padding: 0 30px !important;
+                            }
+                        </style>
+
+                        <input class="button" type="submit" name="submit" value="Comment" />
+                    </form>
+                </div>
+            </div>
+
+            <!-- COMMENT FORM END -->
+
+
         </div>
-
-        <!-- COMMENT FORM END -->
-
-
-    </div>
 </body>
 
 </html>

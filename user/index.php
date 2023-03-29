@@ -17,7 +17,7 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
 $row = mysqli_fetch_assoc($res);
 
 // Get all posts
-$postQuery = "SELECT posts.id, posts.title, posts.content, posts.created_at, categories.name AS category, categories.visible AS cat_visible FROM posts 
+$postQuery = "SELECT posts.id, posts.title, posts.content, posts.created_at, posts.visible, categories.name AS category, categories.visible AS cat_visible FROM posts 
             JOIN categories ON posts.category_id = categories.id 
             WHERE author_id = $uid";
 $posts = mysqli_query($conn, $postQuery) or die("Query failed: " . mysqli_error($conn));
@@ -25,6 +25,17 @@ $posts = mysqli_query($conn, $postQuery) or die("Query failed: " . mysqli_error(
 // Get all comments
 $commentQuery = "SELECT * FROM comments WHERE author_id = $uid";
 $comments = mysqli_query($conn, $commentQuery) or die("Query failed: " . mysqli_error($conn));
+
+// Estimate reading time
+function estimateReadingTime($text, $wpm = 200)
+{
+    $totalWords = str_word_count(strip_tags($text));
+    $minutes = round($totalWords / $wpm);
+
+    $minutes = $minutes < 1 ? 1 : $minutes;
+
+    return $minutes;
+}
 ?>
 
 <html>
@@ -67,13 +78,17 @@ $comments = mysqli_query($conn, $commentQuery) or die("Query failed: " . mysqli_
             <!-- List all posts -->
             <div class="my-8">
                 <h2 class="pb-4 border-b h2">Your Posts</h2>
-                <div class="flex flex-col gap-2">
+                <div class="flex flex-col">
                     <?php foreach ($posts as $post) : ?>
-                        <a href='../post?id=<?= $post['id'] ?>' class='flex flex-col gap-2 p-4 transition border-b'>
+                        <a href='../post?id=<?= $post['id'] ?>' class='flex flex-col gap-2 p-6 transition border-b'>
                             <h2 class='h2'><?= $post['title'] ?></h2>
+                            <?php if (!$post['visible']) : ?>
+                                <p class='font-bold text-red-500'>This post is invisible.</p>
+                            <?php endif; ?>
                             <p class='pb-4'><?= strip_tags(substr($post['content'], 0, 100)) ?>...</p>
                             <div class='flex items-center gap-2 text-sm'>
                                 <?php if ($post['cat_visible']) echo "<p class='px-3 py-1 bg-gray-100 rounded-full w-min'>" . $post['category'] . "</p>" ?>
+                                <p class='text-gray-400'><?= estimateReadingTime($post['content']) ?> min read</p>
                             </div>
                         </a>
                     <?php endforeach; ?>
