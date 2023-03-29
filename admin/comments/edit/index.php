@@ -24,6 +24,7 @@ require_once('../../../lib/utils/conn.php');
 
 $query = "SELECT * FROM comments WHERE id = " . $_GET['id'];
 $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
+if (mysqli_num_rows($res) === 0) header("Location: ../");
 extract(mysqli_fetch_array($res));
 
 // If form submitted

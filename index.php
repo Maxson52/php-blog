@@ -57,8 +57,8 @@ function estimateReadingTime($text, $wpm = 200)
 
 <body>
   <!-- NAV START -->
-  <!-- change navbar bg to white after scrolling -->
   <script>
+    // Change navbar bg on scroll
     window.onscroll = function() {
       scrollFunction()
     };
@@ -78,9 +78,17 @@ function estimateReadingTime($text, $wpm = 200)
         document.querySelector("nav").classList.remove("text-black");
       }
     }
+
+    // Move background on hero based on mouse position
+    document.addEventListener('mousemove', function(e) {
+      const hero = document.querySelector('#hero-bg');
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      hero.style.backgroundPosition = `${x * 6}% ${y * 6}%`;
+    });
   </script>
 
-  <nav class="fixed flex items-center justify-between w-full px-8 py-4 mx-auto text-white transition-all bg-transparent">
+  <nav class="fixed z-40 flex items-center justify-between w-full px-8 py-4 mx-auto text-white transition-all bg-transparent">
     <div>
       <img src="./lib/assets/strawberry.png" alt="egg" class="w-12 rounded-full aspect-auto">
     </div>
@@ -97,12 +105,29 @@ function estimateReadingTime($text, $wpm = 200)
 
   <!-- HERO START -->
   <section id="hero" class="grid place-items-center w-full bg-gradient-to-r from-indigo-300 to-purple-400 h-[50rem]">
-    <div class="flex flex-col justify-center w-3/4 gap-4">
+    <div class="z-20 flex flex-col justify-center w-3/4 gap-4">
       <h1 class="font-bold text-white text-7xl">Fry Me to the Moon</h1>
       <p class="mt-4 text-lg text-white">The place for all your cooking needs</p>
-      <a href="./post/create" class="px-6 py-1 mt-6 font-bold bg-black border-black rounded-full button w-fit">Get writing →</a>
+      <a href="./post/create" class="px-6 py-1 mt-6 font-bold bg-black border-black rounded-full button w-fit">Start writing →</a>
     </div>
+    <div id="hero-bg"></div>
   </section>
+
+  <style>
+    #hero-bg {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.1) 8%,
+          transparent 8%);
+      background-position: 0% 0%;
+      background-size: 9.5vmin 9.5vmin;
+      height: 50rem;
+      width: 100%;
+      left: 0px;
+      position: absolute;
+      top: 0px;
+      transition: opacity 800ms ease;
+      z-index: 1;
+    }
+  </style>
   <!-- HERO END -->
 
   <section class="grid w-full place-items-center">

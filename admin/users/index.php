@@ -70,7 +70,7 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
                             "<td class='px-4 py-2 border'>$name</td>
                         <td class='px-4 py-2 border'>$email</td>
                         <td class='px-4 py-2 border'>$role</td>
-                        <td class='px-4 py-2 border'><a class='link' href='edit?id=$id'>Edit</a></td>
+                        <td class='px-4 py-2 border'><a class='link' href='../../user/edit?id=$id&redirect=../../admin/users'>Edit</a></td>
                         </tr>";
                     }
                     ?>

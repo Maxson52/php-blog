@@ -64,7 +64,7 @@ if (isset($_POST['submit'])) {
             <p class="text-red-500"><?php echo $error ?></p>
 
             <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" class="flex flex-col gap-2">
-                <input class="text-input" type="text" name="category" placeholder="Enter category">
+                <input class="text-input" type="text" name="category" placeholder="Enter category name">
 
                 <input class="button" type="submit" name="submit" value="Create category" />
             </form>

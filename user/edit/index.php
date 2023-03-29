@@ -7,9 +7,9 @@ if (!isset($_SESSION['user'])) {
     header("Location: ../../../auth/log-in.php");
 }
 
-// If not admin redirect to home
-if ($_SESSION['user']['role'] !== 'admin') {
-    header("Location: ../../../");
+// If not admin or the user redirect to home
+if ($_SESSION['user']['role'] !== "admin" && $_SESSION['user']['id'] !== $_GET['id']) {
+    header("Location: ../");
 }
 
 // If no id set redirect to admin page
@@ -20,22 +20,24 @@ if (!isset($_GET['id'])) {
 $error = "";
 
 // Get user from DB
-require_once('../../../lib/utils/conn.php');
+require_once('../../lib/utils/conn.php');
 
 $query = "SELECT * FROM users WHERE id = " . $_GET['id'];
 $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
+if (mysqli_num_rows($res) === 0) header("Location: ../../");
 extract(mysqli_fetch_array($res));
 
 // If form submitted
 if (isset($_POST['submit'])) {
     $name = $_POST['name'];
     $email = $_POST['email'];
-    $role = $_POST['role'];
+    $role = $_POST['role'] ?? $_SESSION['user']['role'];
 
     $query = "UPDATE users SET name = '$name', email = '$email', role = '$role' WHERE id = " . $_GET['id'];
     $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
-    header("Location: ../");
+    $redirect = $_GET['redirect'] ?? "../";
+    header("Location: $redirect");
 }
 
 ?>
@@ -44,8 +46,8 @@ if (isset($_POST['submit'])) {
 
 <head>
     <title>Fry Me to the Moon</title>
-    <link rel="icon" href="../../../lib/assets/strawberry.png" />
-    <link href="../../../lib/css/output.css" rel="stylesheet" />
+    <link rel="icon" href="../../lib/assets/strawberry.png" />
+    <link href="../../lib/css/output.css" rel="stylesheet" />
 </head>
 
 
@@ -69,16 +71,19 @@ if (isset($_POST['submit'])) {
 
             <p class="text-red-500"><?php echo $error ?></p>
 
-            <form action="<?php echo $_SERVER['PHP_SELF'] . "?id=" . $_GET['id'] ?>" method="POST" class="flex flex-col gap-2">
+            <form action="<?php echo $_SERVER['PHP_SELF'] . "?id=" . $_GET['id'] . (isset($_GET['redirect']) ? "&redirect=" . $_GET['redirect'] : "") ?>" method="POST" class="flex flex-col gap-2">
                 <input class="text-input" type="text" name="name" placeholder="Enter name" value="<?php echo $name ?>" required>
 
                 <input class="text-input" type="email" name="email" placeholder="Enter email" value="<?php echo $email ?>" required>
 
-                <select class="select-input" name="role">
-                    <option <?php echo $role === "user" ? "selected" : "" ?> value="user">User</option>
-                    <option <?php echo $role === "mod" ? "selected" : "" ?> value="mod">Mod</option>
-                    <option <?php echo $role === "admin" ? "selected" : "" ?> value="admin">Admin</option>
-                </select>
+                <!-- If admin allow changing role -->
+                <?php if ($_SESSION['user']['role'] === "admin") : ?>
+                    <select class="select-input" name="role">
+                        <option <?php echo $role === "user" ? "selected" : "" ?> value="user">User</option>
+                        <option <?php echo $role === "mod" ? "selected" : "" ?> value="mod">Mod</option>
+                        <option <?php echo $role === "admin" ? "selected" : "" ?> value="admin">Admin</option>
+                    </select>
+                <?php endif; ?>
 
                 <input class="button" type="submit" name="submit" value="Update user" />
             </form>

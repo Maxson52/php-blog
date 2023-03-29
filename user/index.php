@@ -60,6 +60,8 @@ $comments = mysqli_query($conn, $commentQuery) or die("Query failed: " . mysqli_
                 <h1 class="h1"><?php echo $row['name'] ?></h1>
 
                 <h3 class="h3"><?php echo $row['email'] ?></h3>
+
+                <a href="edit?id=<?= $_SESSION['user']['id'] ?>" class="link">Edit profile</a>
             </div>
 
             <!-- List all posts -->
@@ -74,8 +76,11 @@ $comments = mysqli_query($conn, $commentQuery) or die("Query failed: " . mysqli_
                                 <?php if ($post['cat_visible']) echo "<p class='px-3 py-1 bg-gray-100 rounded-full w-min'>" . $post['category'] . "</p>" ?>
                             </div>
                         </a>
-
                     <?php endforeach; ?>
+                    <!-- No posts yet -->
+                    <?php if (mysqli_num_rows($posts) == 0) : ?>
+                        <p class='mt-4 text-gray-400'>You haven't posted anything yet.</p>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -89,6 +94,10 @@ $comments = mysqli_query($conn, $commentQuery) or die("Query failed: " . mysqli_
                             <?= $comment['content'] ?>
                         </a>
                     <?php endforeach; ?>
+                    <!-- No comments yet -->
+                    <?php if (mysqli_num_rows($comments) == 0) : ?>
+                        <p class='mt-4 text-gray-400'>You haven't commented anything yet.</p>
+                    <?php endif; ?>
                 </div>
             </div>
 
