@@ -14,15 +14,31 @@ $category = $_GET['category'] ?? -1;
 $sort_order = $_GET['sort_order'] ?? 'DESC';
 
 if (!is_numeric($category)) header("Location: ./");
+if (isset($_GET['search']) && $_GET['search'] === '') header("Location: ./");
 
-$query = "SELECT posts.id, posts.title, posts.content, posts.created_at, posts.author_id, users.name AS author, categories.name AS category, categories.visible AS cat_visible FROM posts 
+$search = mysqli_real_escape_string($conn, $_GET['search'] ?? '');
+$query = "SELECT posts.id, posts.title, posts.content, posts.created_at, posts.author_id, users.name AS author, categories.name AS category, categories.visible AS cat_visible 
+            FROM posts 
             JOIN users ON posts.author_id = users.id 
             JOIN categories ON posts.category_id = categories.id
             WHERE posts.visible = 1 
             AND (posts.category_id = $category OR $category = -1)
+            AND (posts.title LIKE '%$search%' OR posts.content LIKE '%$search%' OR users.name LIKE '%$search%')
             ORDER BY posts.created_at $sort_order";
 
-$res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
+
+$dbRes = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
+$res = [];
+
+// Highlight search terms
+while ($row = mysqli_fetch_array($dbRes)) {
+  if (isset($_GET['search'])) {
+    $row['content'] = preg_replace('/(' . $search . ')/i', '<mark>$1</mark>', $row['content']);
+    $row['title'] = preg_replace('/(' . $search . ')/i', '<mark>$1</mark>', $row['title']);
+    $row['author'] = preg_replace('/(' . $search . ')/i', '<mark>$1</mark>', $row['author']);
+  }
+  $res[] = $row;
+}
 
 // Get all categories
 $catsQuery = "SELECT * FROM categories WHERE visible = 1";
@@ -101,7 +117,7 @@ function estimateReadingTime($text, $wpm = 200)
   <section id="hero" class="grid place-items-center w-full bg-gradient-to-r from-indigo-300 to-purple-400 h-[50rem]">
     <div class="z-20 flex flex-col justify-center w-3/4 gap-4">
       <h1 class="font-bold text-white text-7xl">Fry Me to the Moon</h1>
-      <p class="mt-4 text-lg text-white">The place for all your cooking needs</p>
+      <p class="mt-4 text-xl text-white md:w-1/2">Don't settle for ordinary meals, discover extraordinary dishes, then add your own cosmic flair.</p>
       <a href="./post/create" class="px-6 py-1 mt-6 font-bold bg-black border-black rounded-full button w-fit">Start writing →</a>
     </div>
     <div id="hero-bg"></div>
@@ -125,7 +141,7 @@ function estimateReadingTime($text, $wpm = 200)
   <!-- HERO END -->
 
   <section class="grid w-full place-items-center">
-    <div class="flex flex-col-reverse w-full max-w-6xl grid-cols-none gap-2 p-8 lg:grid lg:grid-cols-3">
+    <div class="flex flex-col-reverse w-full max-w-6xl grid-cols-none gap-8 p-8 lg:grid lg:grid-cols-3">
 
       <!-- LIST ARTICLES START -->
       <div class="grid w-full gap-4 lg:col-span-2">
@@ -136,7 +152,7 @@ function estimateReadingTime($text, $wpm = 200)
               <p> <?= $article['author'] ?> <span class='text-gray-400'> · <?= date('M d, Y', strtotime($article['created_at'])) ?></span></p>
             </div>
             <h2 class='h2'><?= $article['title'] ?></h2>
-            <p class='pb-4'><?= strip_tags(substr($article['content'], 0, 100)) ?>...</p>
+            <p class='pb-4'><?= strip_tags(substr($article['content'], 0, 100), ["mark"]) ?>...</p>
             <div class='flex items-center gap-2 text-sm'>
               <?php if ($article['cat_visible']) echo "<p class='px-3 py-1 bg-gray-100 rounded-full w-min'>" . $article['category'] . "</p>" ?>
               <p class='text-gray-400'><?= estimateReadingTime($article['content']) ?> min read</p>
@@ -144,7 +160,7 @@ function estimateReadingTime($text, $wpm = 200)
           </a>
         <?php endforeach; ?>
         <?php
-        if (mysqli_num_rows($res) === 0) {
+        if (count($res) === 0) {
           echo "<p class='text-gray-400'>No articles found.</p>";
         }
         ?>
@@ -165,27 +181,40 @@ function estimateReadingTime($text, $wpm = 200)
         </script>
         <!-- FILTERS END -->
         <!-- LIST CATEGORIES START -->
-        <div class="flex flex-wrap gap-2 mb-4">
-          <a onclick="update('category', '');" href="javascript:void(0)" class="px-3 py-1 bg-gray-100 rounded-full w-fit">
+        <div class="flex flex-wrap gap-2">
+          <a onclick="update('category', '');" href="javascript:void(0)" class="px-3 py-1 rounded-full w-fit <?= (isset($_GET['category']) ? "bg-gray-100" : "bg-neutral-200") ?>">
             All
           </a>
           <?php foreach ($cats as $cat) : ?>
-            <a onclick="update('category', '<?= $cat['id'] ?>');" href="javascript:void(0)" class="px-3 py-1 bg-gray-100 rounded-full w-fit">
+            <a onclick="update('category', '<?= $cat['id'] ?>');" href="javascript:void(0)" class="px-3 py-1 rounded-full w-fit <?= (isset($_GET['category']) && $_GET['category'] == $cat['id'] ? "bg-neutral-200" : "bg-gray-100") ?>">
               <?= $cat['name'] ?>
             </a>
           <?php endforeach; ?>
         </div>
         <!-- LIST CATEGORIES END -->
+        <hr class="my-4" />
         <!-- LIST SORT ORDER START -->
-        <div class="flex flex-wrap gap-2 mb-4">
-          <a onclick="update('sort_order', '');" href="javascript:void(0)" class="px-3 py-1 bg-gray-100 rounded-full w-fit">
+        <div class="flex flex-wrap gap-2">
+          <a onclick="update('sort_order', '');" href="javascript:void(0)" class="px-3 py-1 rounded-full w-fit <?= (isset($_GET['sort_order']) ? "bg-gray-100" : "bg-neutral-200") ?>">
             Newest First
           </a>
-          <a onclick="update('sort_order', 'ASC');" href="javascript:void(0)" class="px-3 py-1 bg-gray-100 rounded-full w-fit">
+          <a onclick="update('sort_order', 'ASC');" href="javascript:void(0)" class="px-3 py-1 rounded-full w-fit <?= (!isset($_GET['sort_order']) ? "bg-gray-100" : "bg-neutral-200") ?>">
             Oldest First
           </a>
         </div>
         <!-- LIST SORT ORDER END -->
+        <hr class="my-4" />
+        <!-- SEARCH START -->
+        <form method="GET" action="./" class="flex flex-wrap gap-2">
+          <input type="text" class="w-full border-gray-300 rounded-full text-input" name="search" placeholder="Search">
+          <div class="flex justify-end w-full gap-2">
+            <input type="submit" value="Submit" class="px-3 py-1 rounded-full cursor-pointer bg-neutral-200 w-min">
+            <a onclick="update('search', '');" href="javascript:void(0)" class="px-3 py-1 bg-gray-100 rounded-full w-min">
+              Clear
+            </a>
+          </div>
+        </form>
+        <!-- SEARCH END -->
       </div>
       <!-- FILTERS END -->
     </div>

@@ -51,7 +51,7 @@ if (isset($_POST['submit'])) {
             <p class="text-red-500"><?php echo $error ?></p>
 
             <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" class="flex flex-col gap-2">
-                <input class="text-input" type="text" name="name" placeholder="Enter your name" required>
+                <input class="text-input" type="text" name="name" placeholder="Enter your name" required autofocus>
 
                 <input class="text-input" type="email" name="email" placeholder="Enter your email" required>
 

@@ -4,7 +4,7 @@
 
 @layer base {
   hr {
-    @apply w-full border border-gray-200;
+    @apply w-full border-t border-gray-200;
   }
 }
 
