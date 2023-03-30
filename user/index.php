@@ -22,8 +22,10 @@ $postQuery = "SELECT posts.id, posts.title, posts.content, posts.created_at, pos
             WHERE author_id = $uid";
 $posts = mysqli_query($conn, $postQuery) or die("Query failed: " . mysqli_error($conn));
 
-// Get all comments
-$commentQuery = "SELECT * FROM comments WHERE author_id = $uid";
+// Get all comments on visible posts
+$commentQuery = "SELECT comments.id, comments.content, comments.created_at, posts.title AS post_title, posts.id AS post_id FROM comments 
+                JOIN posts ON comments.post_id = posts.id 
+                WHERE comments.author_id = $uid AND posts.visible = 1";
 $comments = mysqli_query($conn, $commentQuery) or die("Query failed: " . mysqli_error($conn));
 
 // Estimate reading time
@@ -41,6 +43,7 @@ function estimateReadingTime($text, $wpm = 200)
 <html>
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Fry Me to the Moon</title>
     <link rel="icon" href="../lib/assets/strawberry.png" />
     <link href="../lib/css/output.css" rel="stylesheet" />

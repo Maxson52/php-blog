@@ -45,6 +45,7 @@ if (isset($_POST['submit'])) {
 <html>
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Fry Me to the Moon</title>
     <link rel="icon" href="../../lib/assets/strawberry.png" />
     <link href="../../lib/css/output.css" rel="stylesheet" />

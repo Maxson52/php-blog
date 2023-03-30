@@ -10,25 +10,18 @@ if (!isset($_SESSION['user'])) {
 // Get all articles
 require_once('./lib/utils/conn.php');
 
-if (isset($_GET['category'])) {
-  $category = $_GET['category'];
+$category = $_GET['category'] ?? -1;
+$sort_order = $_GET['sort_order'] ?? 'DESC';
 
-  if (!is_numeric($category)) header("Location: ./");
+if (!is_numeric($category)) header("Location: ./");
 
-  $query = "SELECT posts.id, posts.title, posts.content, posts.created_at, posts.author_id, users.name AS author, categories.name AS category, categories.visible AS cat_visible FROM posts 
+$query = "SELECT posts.id, posts.title, posts.content, posts.created_at, posts.author_id, users.name AS author, categories.name AS category, categories.visible AS cat_visible FROM posts 
             JOIN users ON posts.author_id = users.id 
             JOIN categories ON posts.category_id = categories.id
             WHERE posts.visible = 1 
-            AND posts.category_id = $category
-            AND categories.visible = 1
-            ORDER BY posts.created_at DESC";
-} else {
-  $query = "SELECT posts.id, posts.title, posts.content, posts.created_at, posts.author_id, users.name AS author, categories.name AS category, categories.visible AS cat_visible FROM posts 
-            JOIN users ON posts.author_id = users.id 
-            JOIN categories ON posts.category_id = categories.id
-            WHERE posts.visible = 1 
-            ORDER BY posts.created_at DESC";
-}
+            AND (posts.category_id = $category OR $category = -1)
+            ORDER BY posts.created_at $sort_order";
+
 $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
 // Get all categories
@@ -49,6 +42,7 @@ function estimateReadingTime($text, $wpm = 200)
 <html>
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fry Me to the Moon</title>
   <link rel="icon" href="./lib/assets/strawberry.png" />
   <link href="./lib/css/output.css" rel="stylesheet" />
@@ -131,22 +125,10 @@ function estimateReadingTime($text, $wpm = 200)
   <!-- HERO END -->
 
   <section class="grid w-full place-items-center">
-    <div class="flex flex-col w-full max-w-6xl gap-2 p-8">
-      <!-- LIST CATEGORIES START -->
-      <div class="flex flex-wrap gap-2 mb-4">
-        <a href="./" class="px-3 py-1 bg-gray-100 rounded-full w-min">
-          All
-        </a>
-        <?php foreach ($cats as $cat) : ?>
-          <a href="./?category=<?= $cat['id'] ?>" class="px-3 py-1 bg-gray-100 rounded-full w-min">
-            <?= $cat['name'] ?>
-          </a>
-        <?php endforeach; ?>
-      </div>
-      <!-- LIST CATEGORIES END -->
+    <div class="flex flex-col-reverse w-full max-w-6xl grid-cols-none gap-2 p-8 lg:grid lg:grid-cols-3">
 
       <!-- LIST ARTICLES START -->
-      <div class="grid w-full gap-4">
+      <div class="grid w-full gap-4 lg:col-span-2">
         <?php foreach ($res as $article) : ?>
           <a href='./post?id=<?= $article['id'] ?>' class='flex flex-col gap-2 p-4 transition border-b'>
             <div class='flex gap-2'>
@@ -169,6 +151,43 @@ function estimateReadingTime($text, $wpm = 200)
       </div>
       <!-- LIST ARTICLES END -->
 
+      <!-- FILTERS START -->
+      <div class="lg:col-start-3">
+        <script>
+          function update(a, b) {
+            var searchParams = new URLSearchParams(window.location.search);
+            if (b != '')
+              searchParams.set(a, b);
+            else
+              searchParams.delete(a);
+            window.location.search = searchParams.toString();
+          }
+        </script>
+        <!-- FILTERS END -->
+        <!-- LIST CATEGORIES START -->
+        <div class="flex flex-wrap gap-2 mb-4">
+          <a onclick="update('category', '');" href="javascript:void(0)" class="px-3 py-1 bg-gray-100 rounded-full w-fit">
+            All
+          </a>
+          <?php foreach ($cats as $cat) : ?>
+            <a onclick="update('category', '<?= $cat['id'] ?>');" href="javascript:void(0)" class="px-3 py-1 bg-gray-100 rounded-full w-fit">
+              <?= $cat['name'] ?>
+            </a>
+          <?php endforeach; ?>
+        </div>
+        <!-- LIST CATEGORIES END -->
+        <!-- LIST SORT ORDER START -->
+        <div class="flex flex-wrap gap-2 mb-4">
+          <a onclick="update('sort_order', '');" href="javascript:void(0)" class="px-3 py-1 bg-gray-100 rounded-full w-fit">
+            Newest First
+          </a>
+          <a onclick="update('sort_order', 'ASC');" href="javascript:void(0)" class="px-3 py-1 bg-gray-100 rounded-full w-fit">
+            Oldest First
+          </a>
+        </div>
+        <!-- LIST SORT ORDER END -->
+      </div>
+      <!-- FILTERS END -->
     </div>
   </section>
 

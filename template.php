@@ -13,6 +13,7 @@ if (!isset($_SESSION['user'])) {
 <html>
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Fry Me to the Moon</title>
     <!-- FIXME: Change path -->
     <link rel="icon" href="./lib/assets/strawberry.png" />

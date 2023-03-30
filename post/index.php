@@ -17,12 +17,11 @@ require_once('../lib/utils/conn.php');
 
 $id = $_GET['id'];
 
-// Get post
-$query = "SELECT posts.id, posts.title, posts.content, posts.created_at, posts.author_id, users.name FROM posts 
-            JOIN users ON posts.author_id = users.id 
-            WHERE posts.id = $id
-            AND posts.visible = 1
-            ";
+// Get post (as long as it's visible or the author is the current user)
+$query = "SELECT posts.id, posts.title, posts.content, posts.created_at, posts.author_id, posts.visible, users.name FROM posts 
+        JOIN users ON posts.author_id = users.id 
+        WHERE posts.id = $id 
+        AND (posts.visible = 1 OR posts.author_id = " . $_SESSION['user']['id'] . ")";
 $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
 // Redirect if no post
@@ -31,7 +30,7 @@ if (mysqli_num_rows($res) == 0) {
 }
 
 // Get comments
-$commentsQuery = "SELECT comments.id, comments.content, comments.created_at, users.name FROM comments 
+$commentsQuery = "SELECT comments.id, comments.content, comments.created_at, comments.author_id, users.name FROM comments 
                 JOIN users ON comments.author_id = users.id 
                 WHERE comments.post_id = $id 
                 AND comments.visible = 1
@@ -64,6 +63,7 @@ if (isset($_POST['submit'])) {
 <html>
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Fry Me to the Moon</title>
     <link rel="icon" href="../lib/assets/strawberry.png" />
     <link href="../lib/css/output.css" rel="stylesheet" />
@@ -95,7 +95,7 @@ if (isset($_POST['submit'])) {
                 $author = $row['name'];
                 $date = date('M d, Y', strtotime($row['created_at'])); ?>
 
-                <h1 class="text-5xl font-medium text-center"><?= $title ?></h1>
+                <h1 class="mb-2 text-5xl font-medium text-center"><?= $title ?></h1>
                 <div class="flex justify-center gap-2">
                     <p class="text-gray-500"><?= $author ?></p>
                     -
@@ -105,6 +105,11 @@ if (isset($_POST['submit'])) {
                         <span class="text-gray-400">- </span><a href="../post/edit?id=<?= $row['id'] ?>" class="link">Edit Post</a>
                     <?php endif; ?>
                 </div>
+
+                <?php if ($row['visible'] == 0) : ?>
+                    <p class="font-bold text-center text-red-500">This post is not visible to the public.</p>
+                <?php endif; ?>
+
                 <div class="my-12 prose" id="content"><?= $content ?></div>
                 <style>
                     #content {
@@ -132,9 +137,15 @@ if (isset($_POST['submit'])) {
                     ?>
 
                     <div class="flex flex-col w-full gap-2 p-4 transition border-b ">
-                        <h3 class="h3"><?php echo $author ?></h3>
+                        <div class="flex justify-between">
+                            <h3 class="h3"><?php echo $author ?></h3>
+                            <?php if ($_SESSION['user']['id'] == $comment['author_id'] || $_SESSION['user']['role'] == 'admin') : ?>
+                                <a href="../comment/edit?id=<?= $comment['id'] ?>" class="link">Edit Comment</a>
+                            <?php endif; ?>
+                        </div>
                         <p class="text-gray-500"><?php echo $date ?></p>
                         <p class="prose"><?php echo $content ?></p>
+
                     </div>
                 <?php endforeach; ?>
                 <?php

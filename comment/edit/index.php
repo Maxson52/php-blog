@@ -4,12 +4,7 @@ session_start();
 
 // If not authed redirect to login page
 if (!isset($_SESSION['user'])) {
-    header("Location: ../../../auth/log-in.php");
-}
-
-// If not admin redirect to home
-if ($_SESSION['user']['role'] !== 'admin') {
-    header("Location: ../../../");
+    header("Location: ../../auth/log-in.php");
 }
 
 // If no id set redirect to admin page
@@ -20,17 +15,22 @@ if (!isset($_GET['id'])) {
 $error = "";
 
 // Get user from DB
-require_once('../../../lib/utils/conn.php');
+require_once('../../lib/utils/conn.php');
 
 $query = "SELECT * FROM comments WHERE id = " . $_GET['id'];
 $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 if (mysqli_num_rows($res) === 0) header("Location: ../");
 extract(mysqli_fetch_array($res));
 
+// If not admin or not author redirect to home
+if ($_SESSION['user']['role'] !== 'admin' && $_SESSION['user']['id'] !== $author_id) {
+    header("Location: ../../");
+}
+
 // If form submitted
 if (isset($_POST['submit'])) {
     $newContent = $_POST['content'];
-    $newVisibility = $_POST['visibility'];
+    $newVisibility = $_POST['visibility'] ?? $visible;
 
     $escapedContent = mysqli_real_escape_string($conn, $newContent);
 
@@ -38,7 +38,8 @@ if (isset($_POST['submit'])) {
     $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
     if ($res) {
-        header("Location: ../");
+        $redirect = $_GET['redirect'] ?? "../../user";
+        header("Location: $redirect");
     } else {
         $error = "Something went wrong";
     }
@@ -49,9 +50,10 @@ if (isset($_POST['submit'])) {
 <html>
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Fry Me to the Moon</title>
-    <link rel="icon" href="../../../lib/assets/strawberry.png" />
-    <link href="../../../lib/css/output.css" rel="stylesheet" />
+    <link rel="icon" href="../../lib/assets/strawberry.png" />
+    <link href="../../lib/css/output.css" rel="stylesheet" />
 </head>
 
 
@@ -63,7 +65,7 @@ if (isset($_POST['submit'])) {
         </div>
         <div class="flex space-x-8">
             <a href="../">Back</a>
-            <a href="../../../auth/log-out.php">Log out</a>
+            <a href="../../auth/log-out.php">Log out</a>
         </div>
     </nav>
     <!-- NAV END -->
@@ -73,15 +75,19 @@ if (isset($_POST['submit'])) {
 
     <div class="grid place-items-center">
         <div class="flex flex-col gap-2 mt-24 min-w-[50%] max-w-6xl">
-            <h1 class="h1">Edit comment</h1>
+            <h1 class="h1">Edit Comment</h1>
 
             <p class="text-red-500"><?php echo $error ?></p>
 
-            <form action="<?php echo $_SERVER['PHP_SELF'] . "?id=" . $_GET['id'] ?>" method="POST" class="flex flex-col gap-2">
-                <select class="select-input" name="visibility" id="visibility">
-                    <option value="true" <?php if ($visible) echo "selected" ?>>Visible</option>
-                    <option value="false" <?php if (!$visible) echo "selected" ?>>Hidden</option>
-                </select>
+            <form action="<?php echo $_SERVER['PHP_SELF'] . "?id=" . $_GET['id'] . (isset($_GET['redirect']) ? "&redirect=" . $_GET['redirect'] : "") ?>" method="POST" class="flex flex-col gap-2">
+
+                <!-- Allow admins to change visibility -->
+                <?php if ($_SESSION['user']['role'] === "admin") : ?>
+                    <select class="select-input" name="visibility" id="visibility">
+                        <option value="true" <?php if ($visible) echo "selected" ?>>Visible</option>
+                        <option value="false" <?php if (!$visible) echo "selected" ?>>Hidden</option>
+                    </select>
+                <?php endif; ?>
 
                 <textarea id="editor" name="content"><?php echo $content ?></textarea>
                 <script>

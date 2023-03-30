@@ -45,7 +45,7 @@ if (isset($_POST['submit'])) {
     $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
     if ($res) {
-        $redirect = $_GET['redirect'] ?? "../?id=" . $_GET['id'];
+        $redirect = $_GET['redirect'] ?? "../../user";
         header("Location: $redirect");
     } else {
         $error = "Something went wrong";
@@ -57,6 +57,7 @@ if (isset($_POST['submit'])) {
 <html>
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Fry Me to the Moon</title>
     <link rel="icon" href="../../lib/assets/strawberry.png" />
     <link href="../../lib/css/output.css" rel="stylesheet" />
@@ -81,7 +82,7 @@ if (isset($_POST['submit'])) {
 
     <div class="grid place-items-center">
         <div class="flex flex-col gap-2 mt-24 min-w-[50%] max-w-6xl">
-            <h1 class="h1">Edit post</h1>
+            <h1 class="h1">Edit Post</h1>
 
             <p class="text-red-500"><?php echo $error ?></p>
 
