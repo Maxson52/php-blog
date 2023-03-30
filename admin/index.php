@@ -18,6 +18,11 @@ require_once('../lib/utils/conn.php');
 $query = "SELECT * FROM users";
 $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
+// --------------------- STATS ---------------------
+// Get all posts from DB
+$postsQuery = "SELECT * FROM posts";
+$posts = mysqli_query($conn, $postsQuery) or die("Query failed: " . mysqli_error($conn));
+
 ?>
 
 <html>
@@ -44,8 +49,7 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
     <!-- NAV END -->
 
     <!-- ADMIN DASHBOARD START -->
-
-    <div class="grid place-items-center">
+    <div class="grid gap-8 place-items-center">
         <div class="flex flex-col gap-2 mt-24 min-w-[50%] max-w-6xl">
             <h1 class="h1">Admin Panel</h1>
 
@@ -54,8 +58,111 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
             <a href="comments" class="link">Manage Comments</a>
             <a href="categories" class="link">Manage Categories</a>
         </div>
-    </div>
 
+        <!-- STATS START -->
+        <div class="flex flex-col gap-2 min-w-[50%] max-w-6xl">
+
+            <h2 class="h2">Stats For Nerds</h2>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+
+            <!-- Create chart of posts in last 14 days -->
+            <h3 class="h3">Posts Over Last 14 Days</h3>
+            <canvas id="myChart" width="400" height="200"></canvas>
+            <script>
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [
+                            <?php
+                            // Get the last 14 days
+                            $days = array();
+                            for ($i = 0; $i < 14; $i++) {
+                                $days[] = date("M d, Y", strtotime("-$i days"));
+                            }
+                            // Get the day for each post
+                            $postsPerDay = array();
+                            foreach ($days as $day) {
+                                $postsPerDay[$day] = 0;
+                            }
+                            while ($row = mysqli_fetch_assoc($posts)) {
+                                $date = date("M d, Y", strtotime($row['created_at']));
+
+                                if (array_key_exists($date, $postsPerDay)) {
+                                    $postsPerDay[$date]++;
+                                }
+                            }
+                            // Create labels for chart
+                            $postsPerDay = array_reverse($postsPerDay);
+                            foreach ($postsPerDay as $day => $count) {
+                                echo "'$day', ";
+                            }
+                            ?>
+                        ],
+                        datasets: [{
+                            label: '# of Posts',
+                            data: [
+                                <?php
+                                // Create data for chart
+                                foreach ($postsPerDay as $day => $count) {
+                                    echo "$count, ";
+                                }
+                                ?>
+                            ],
+                            borderColor: [
+                                'rgba(147, 51, 234, 1)',
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        elements: {
+                            line: {
+                                tension: 0
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                },
+                            }
+                        }
+                    }
+                });
+            </script>
+
+            <!-- Create chart of posts by category -->
+            <canvas id="myChart2" width="400" height="400"></canvas>
+            <script>
+                var ctx = document.getElementById('myChart2').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: [
+                            <?php
+                            // Get all categories
+                            $categoriesQuery = "SELECT * FROM categories";
+                            $categories = mysqli_query($conn, $categoriesQuery) or die("Query failed: " . mysqli_error($conn));
+
+                            // Get the name of each category
+                            while ($row = mysqli_fetch_assoc($categories)) {
+                                echo "'$row[name]', ";
+                            }
+                            ?>
+                        ],
+                    }
+                });
+            </script>
+        </div>
+        <!-- STATS END -->
+    </div>
     <!-- ADMIN DASHBOARD END -->
 </body>
 
