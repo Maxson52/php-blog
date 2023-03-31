@@ -38,7 +38,7 @@ if (isset($_POST['submit'])) {
     $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
     if ($res) {
-        $redirect = $_GET['redirect'] ?? "../../user";
+        $redirect = $_GET['redirect'] ?? ('../../post/?id=' . $post_id);
         header("Location: $redirect");
     } else {
         $error = "Something went wrong";
@@ -64,7 +64,7 @@ if (isset($_POST['submit'])) {
             <img src="../../lib/assets/strawberry.png" alt="egg" class="w-12 rounded-full aspect-auto">
         </div>
         <div class="flex space-x-8">
-            <a href="<?= $_GET['redirect'] ?? '../' ?>">Back</a>
+            <a href="<?= $_GET['redirect'] ?? ('../../post/?id=' . $post_id) ?>">Back</a>
             <a href="../../auth/log-out.php">Log out</a>
         </div>
     </nav>
@@ -95,20 +95,15 @@ if (isset($_POST['submit'])) {
                         .create(document.querySelector('#editor'))
                         .then(editor => {
                             console.log(editor);
+                            document.getElementsByClassName("ck-editor__main")[0].classList.add("prose");
+                            document.getElementsByClassName("ck-editor__main")[0].style.maxWidth = "none";
                         })
                         .catch(error => {
                             console.error(error);
                         });
                 </script>
 
-                <style>
-                    .ck-editor__editable_inline {
-                        min-height: 250px;
-                        padding: 0 30px !important;
-                    }
-                </style>
-
-                <input class="button" type="submit" name="submit" value="Update comment" />
+                <input class="button" type="submit" name="submit" value="Update" />
             </form>
         </div>
     </div>

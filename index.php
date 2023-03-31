@@ -116,7 +116,7 @@ function estimateReadingTime($text, $wpm = 200)
   <!-- HERO START -->
   <section id="hero" class="grid place-items-center w-full bg-gradient-to-r from-indigo-300 to-purple-400 h-[50rem]">
     <div class="z-20 flex flex-col justify-center w-3/4 gap-4">
-      <h1 class="font-bold text-white text-7xl">Fry Me to the Moon</h1>
+      <h1 class="font-serif font-bold text-white text-7xl">Fry Me to the Moon</h1>
       <p class="mt-4 text-xl text-white md:w-1/2">Don't settle for ordinary meals, discover extraordinary dishes, then add your own cosmic flair.</p>
       <a href="./post/create" class="px-6 py-1 mt-6 font-bold bg-black border-black rounded-full button w-fit">Start writing →</a>
     </div>
@@ -152,7 +152,7 @@ function estimateReadingTime($text, $wpm = 200)
               <p> <?= $article['author'] ?> <span class='text-gray-400'> · <?= date('M d, Y', strtotime($article['created_at'])) ?></span></p>
             </div>
             <h2 class='h2'><?= $article['title'] ?></h2>
-            <p class='pb-4'><?= strip_tags(substr($article['content'], 0, 100), ["mark"]) ?>...</p>
+            <p class='pb-4 font-serif'><?= strip_tags(substr($article['content'], 0, 225), ["mark"]) ?>...</p>
             <div class='flex items-center gap-2 text-sm'>
               <?php if ($article['cat_visible']) echo "<p class='px-3 py-1 bg-gray-100 rounded-full w-min'>" . $article['category'] . "</p>" ?>
               <p class='text-gray-400'><?= estimateReadingTime($article['content']) ?> min read</p>

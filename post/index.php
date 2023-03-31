@@ -104,7 +104,7 @@ if (isset($_POST['submit'])) {
                 <p class="text-gray-500"><?= $date ?></p>
 
                 <?php if ($_SESSION['user']['id'] == $row['author_id'] || $_SESSION['user']['role'] == 'admin') : ?>
-                    <span class="text-gray-400">- </span><a href="../post/edit?id=<?= $row['id'] ?>" class="link">Edit Post</a>
+                    <span class="text-gray-400">- </span><a href="../post/edit?id=<?= $row['id'] ?>" class="link">Edit</a>
                 <?php endif; ?>
             </div>
 
@@ -112,7 +112,7 @@ if (isset($_POST['submit'])) {
                 <p class="font-bold text-center text-red-500">This post is not visible to the public.</p>
             <?php endif; ?>
 
-            <div class="my-12 prose" id="content"><?= $content ?></div>
+            <div class="my-12 font-serif prose" id="content"><?= $content ?></div>
             <style>
                 #content {
                     max-width: none;
@@ -134,18 +134,18 @@ if (isset($_POST['submit'])) {
                     <?php
                     $content = $comment['content'];
                     $author = $comment['name'];
-                    $date = date('M d, Y - g:i', strtotime($comment['created_at']));
+                    $date = date('M d, Y', strtotime($comment['created_at']));
                     ?>
 
                     <div class="flex flex-col w-full gap-2 p-4 transition border-b ">
                         <div class="flex justify-between">
                             <h3 class="h3"><?php echo $author ?></h3>
                             <?php if ($_SESSION['user']['id'] == $comment['author_id'] || $_SESSION['user']['role'] == 'admin') : ?>
-                                <a href="../comment/edit?id=<?= $comment['id'] ?>" class="link">Edit Comment</a>
+                                <a href="../comment/edit?id=<?= $comment['id'] ?>" class="link">Edit</a>
                             <?php endif; ?>
                         </div>
                         <p class="text-gray-500"><?php echo $date ?></p>
-                        <p class="prose"><?php echo $content ?></p>
+                        <div class="font-serif prose"><?php echo $content ?></div>
 
                     </div>
                 <?php endforeach; ?>
@@ -166,7 +166,6 @@ if (isset($_POST['submit'])) {
                 <div class="flex flex-col gap-2 mb-12 min-w-[50%] max-w-6xl">
                     <p class="text-red-500"><?php echo $error ?></p>
 
-
                     <form action="<?php echo $_SERVER['PHP_SELF'] . "?id=" . $_GET['id'] ?>" method="POST" class="flex flex-col gap-2">
                         <textarea id="editor" name="content" placeholder="Write your comment..."></textarea>
                         <script>
@@ -174,17 +173,13 @@ if (isset($_POST['submit'])) {
                                 .create(document.querySelector('#editor'))
                                 .then(editor => {
                                     console.log(editor);
+                                    document.getElementsByClassName("ck-editor__main")[0].classList.add("prose");
+                                    document.getElementsByClassName("ck-editor__main")[0].style.maxWidth = "none";
                                 })
                                 .catch(error => {
                                     console.error(error);
                                 });
                         </script>
-
-                        <style>
-                            .ck-editor__editable_inline {
-                                padding: 0 30px !important;
-                            }
-                        </style>
 
                         <input class="button" type="submit" name="submit" value="Comment" />
                     </form>

@@ -40,7 +40,7 @@ if (isset($_POST['submit'])) {
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Fry Me to the Moon</title>
+    <title>Create Post - Fry Me to the Moon</title>
     <link rel="icon" href="../../lib/assets/strawberry.png" />
     <link href="../../lib/css/output.css" rel="stylesheet" />
 </head>
@@ -48,9 +48,9 @@ if (isset($_POST['submit'])) {
 
 <body>
     <!-- NAV START -->
-    <nav class="container flex justify-between px-8 py-8 mx-auto bg-white">
+    <nav class="fixed z-40 flex items-center justify-between w-full px-8 py-4 mx-auto text-black bg-transparent backdrop-blur-sm">
         <div>
-            <h3 class="text-purple-600 h3">Fry Me to the Moon</h3>
+            <img src="../../lib/assets/strawberry.png" alt="egg" class="w-12 rounded-full aspect-auto">
         </div>
         <div class="flex space-x-8">
             <a href="../">Back</a>
@@ -68,39 +68,40 @@ if (isset($_POST['submit'])) {
 
 
             <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" class="flex flex-col gap-2">
-                <input type="text" name="title" placeholder="What're you calling this post?" class="text-input" required minlength="3">
+                <input type="text" name="title" placeholder="Title" class="p-4 mb-4 font-serif h1 focus:outline-none" required minlength="3">
 
-                <!-- Category select -->
-                <select name="category" class="text-input" required>
-                    <option value="" disabled selected>Select a category</option>
-                    <?php
-                    while ($row = mysqli_fetch_array($cats)) {
-                        echo "<option value='$row[id]'>$row[name]</option>";
-                    }
-                    ?>
-                </select>
-
-
-                <textarea id="editor" name="content">Write your family's greatest recipe, your thoughts on poutine, or anything else on your mind.</textarea>
+                <textarea id="editor" name="content" placeholder="Tell your story..."></textarea>
                 <script>
                     ClassicEditor
                         .create(document.querySelector('#editor'))
                         .then(editor => {
                             console.log(editor);
+                            document.getElementsByClassName("ck-editor__main")[0].classList.add("prose");
+                            document.getElementsByClassName("ck-editor__main")[0].style.maxWidth = "none";
                         })
                         .catch(error => {
                             console.error(error);
                         });
                 </script>
-
                 <style>
                     .ck-editor__editable_inline {
-                        min-height: 250px;
-                        padding: 0 30px !important;
+                        min-height: 400px;
                     }
                 </style>
 
-                <input class="button" type="submit" name="submit" value="Post article" />
+                <div class="flex flex-col w-full gap-2 md:flex-row md:gap-0">
+                    <!-- Category select -->
+                    <select name="category" class="flex-1 select-input md:rounded-r-none" required>
+                        <option value="" disabled selected>Select a category</option>
+                        <?php
+                        while ($row = mysqli_fetch_array($cats)) {
+                            echo "<option value='$row[id]'>$row[name]</option>";
+                        }
+                        ?>
+                    </select>
+
+                    <input class="md:rounded-l-none button" type="submit" name="submit" value="Publish" />
+                </div>
             </form>
         </div>
     </div>
