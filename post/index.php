@@ -24,6 +24,8 @@ $query = "SELECT posts.id, posts.title, posts.content, posts.created_at, posts.a
         AND (posts.visible = 1 OR posts.author_id = " . $_SESSION['user']['id'] . ")";
 $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
+$row = mysqli_fetch_assoc($res);
+
 // Redirect if no post
 if (mysqli_num_rows($res) == 0) {
     header("Location: ../");
@@ -64,7 +66,7 @@ if (isset($_POST['submit'])) {
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Fry Me to the Moon</title>
+    <title><?= $row['title'] ?> - Fry Me to the Moon</title>
     <link rel="icon" href="../lib/assets/strawberry.png" />
     <link href="../lib/css/output.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/@tailwindcss/typography@0.1.2/dist/typography.min.css">
@@ -73,9 +75,9 @@ if (isset($_POST['submit'])) {
 
 <body>
     <!-- NAV START -->
-    <nav class="container flex justify-between px-8 py-8 mx-auto bg-white">
+    <nav class="fixed z-40 flex items-center justify-between w-full px-8 py-4 mx-auto text-black bg-transparent backdrop-blur-sm">
         <div>
-            <h3 class="text-purple-600 h3">Fry Me to the Moon</h3>
+            <img src="../lib/assets/strawberry.png" alt="egg" class="w-12 rounded-full aspect-auto">
         </div>
         <div class="flex space-x-8">
             <a href="../">Back</a>
@@ -87,36 +89,35 @@ if (isset($_POST['submit'])) {
 
     <div class="grid place-items-center">
         <!--  ARTICLE START -->
-        <article class="flex flex-col gap-2 mt-24 min-w-[50%] max-w-6xl px-8">
-            <?php foreach ($res as $row) : ?>
-                <?php
-                $title = $row['title'];
-                $content = $row['content'];
-                $author = $row['name'];
-                $date = date('M d, Y', strtotime($row['created_at'])); ?>
+        <article class="flex flex-col gap-2 mt-48 mb-24 min-w-[50%] max-w-6xl px-8">
+            <?php
+            $title = $row['title'];
+            $content = $row['content'];
+            $author = $row['name'];
+            $date = date('M d, Y', strtotime($row['created_at'])); ?>
 
-                <h1 class="mb-2 text-5xl font-medium text-center"><?= $title ?></h1>
-                <div class="flex justify-center gap-2">
-                    <p class="text-gray-500"><?= $author ?></p>
-                    -
-                    <p class="text-gray-500"><?= $date ?></p>
+            <h1 class="mb-4 text-5xl font-medium text-center"><?= $title ?></h1>
+            <div class="flex justify-center gap-2 mb-12">
+                <img src='https://source.boringavatars.com/beam?name=<?= $row['author_id'] ?>' class='w-6 h-6 rounded-full' />
+                <p class="text-gray-500"><?= $author ?></p>
+                -
+                <p class="text-gray-500"><?= $date ?></p>
 
-                    <?php if ($_SESSION['user']['id'] == $row['author_id'] || $_SESSION['user']['role'] == 'admin') : ?>
-                        <span class="text-gray-400">- </span><a href="../post/edit?id=<?= $row['id'] ?>" class="link">Edit Post</a>
-                    <?php endif; ?>
-                </div>
-
-                <?php if ($row['visible'] == 0) : ?>
-                    <p class="font-bold text-center text-red-500">This post is not visible to the public.</p>
+                <?php if ($_SESSION['user']['id'] == $row['author_id'] || $_SESSION['user']['role'] == 'admin') : ?>
+                    <span class="text-gray-400">- </span><a href="../post/edit?id=<?= $row['id'] ?>" class="link">Edit Post</a>
                 <?php endif; ?>
+            </div>
 
-                <div class="my-12 prose" id="content"><?= $content ?></div>
-                <style>
-                    #content {
-                        max-width: none;
-                    }
-                </style>
-            <?php endforeach; ?>
+            <?php if ($row['visible'] == 0) : ?>
+                <p class="font-bold text-center text-red-500">This post is not visible to the public.</p>
+            <?php endif; ?>
+
+            <div class="my-12 prose" id="content"><?= $content ?></div>
+            <style>
+                #content {
+                    max-width: none;
+                }
+            </style>
             <?php
             if (mysqli_num_rows($res) === 0) {
                 echo "<p class='text-gray-400'>No post found.</p>";
@@ -127,7 +128,7 @@ if (isset($_POST['submit'])) {
 
         <!-- COMMENTS START -->
         <div class="flex flex-col gap-2 min-w-[50%] max-w-6xl px-8">
-            <h2 class="pb-4 border-b h2">Comments</h2>
+            <hr />
             <div class="flex flex-col gap-2">
                 <?php foreach ($comments as $comment) : ?>
                     <?php

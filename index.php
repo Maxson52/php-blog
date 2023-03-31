@@ -206,7 +206,7 @@ function estimateReadingTime($text, $wpm = 200)
         <hr class="my-4" />
         <!-- SEARCH START -->
         <form method="GET" action="./" class="flex flex-wrap gap-2">
-          <input type="text" class="w-full border-gray-300 rounded-full text-input" name="search" placeholder="Search">
+          <input type="text" class="w-full border-gray-300 rounded-full text-input" name="search" placeholder="Search" value="<?= $_GET['search'] ?? '' ?>">
           <div class="flex justify-end w-full gap-2">
             <input type="submit" value="Submit" class="px-3 py-1 rounded-full cursor-pointer bg-neutral-200 w-min">
             <a onclick="update('search', '');" href="javascript:void(0)" class="px-3 py-1 bg-gray-100 rounded-full w-min">

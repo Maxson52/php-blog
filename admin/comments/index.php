@@ -28,7 +28,7 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Fry Me to the Moon</title>
+    <title>Manage Comments - Fry Me to the Moon</title>
     <link rel="icon" href="../../lib/assets/strawberry.png" />
     <link href="../../lib/css/output.css" rel="stylesheet" />
 </head>
@@ -36,9 +36,9 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
 
 <body>
     <!-- NAV START -->
-    <nav class="container flex justify-between px-8 py-8 mx-auto bg-white">
+    <nav class="fixed z-40 flex items-center justify-between w-full px-8 py-4 mx-auto text-black bg-transparent backdrop-blur-sm">
         <div>
-            <h3 class="text-purple-600 h3">Fry Me to the Moon</h3>
+            <img src="../../lib/assets/strawberry.png" alt="egg" class="w-12 rounded-full aspect-auto">
         </div>
         <div class="flex space-x-8">
             <a href="../">Back</a>
@@ -79,7 +79,7 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
                         <td class='px-4 py-2 border'>$visible</td>
                         <td class='px-4 py-2 border'>$date</td>
                         <td class='px-4 py-2 border'>$author</td>
-                        <td class='px-4 py-2 border'><a class='link' href='../../comment/edit?id=$id&redirect=../../admin/posts'>Edit</a></td>
+                        <td class='px-4 py-2 border'><a class='link' href='../../comment/edit?id=$id&redirect=../../admin/comments'>Edit</a></td>
                         </tr>";
                     }
                     ?>

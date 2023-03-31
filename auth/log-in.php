@@ -22,11 +22,15 @@ if (isset($_POST['submit'])) {
         $error = "Email or password is incorrect";
     } else {
         $userInfo = mysqli_fetch_array($res);
-        if (password_verify($password, $userInfo['password'])) {
-            $_SESSION['user'] = $userInfo;
-            header("Location: ../");
+        if ($userInfo['role'] === "deleted") {
+            $error = "Your account has been deleted. Contact us if you think it was by mistake";
         } else {
-            $error = "Email or password is incorrect";
+            if (password_verify($password, $userInfo['password'])) {
+                $_SESSION['user'] = $userInfo;
+                header("Location: ../");
+            } else {
+                $error = "Email or password is incorrect";
+            }
         }
     }
 

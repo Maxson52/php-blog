@@ -3,7 +3,7 @@ CREATE TABLE `users`(
     `name` VARCHAR(33) NOT NULL,
     `email` VARCHAR(33) NOT NULL UNIQUE,
     `password` VARCHAR(255) NOT NULL,
-    `role` ENUM('user', 'mod', 'admin') NOT NULL DEFAULT 'user'
+    `role` ENUM('deleted', 'user', 'admin') NOT NULL DEFAULT 'user'
 );
 
 CREATE TABLE `posts`(

@@ -23,13 +23,17 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
 $postsQuery = "SELECT * FROM posts";
 $posts = mysqli_query($conn, $postsQuery) or die("Query failed: " . mysqli_error($conn));
 
+// Get all comments from DB
+$commentsQuery = "SELECT * FROM comments";
+$comments = mysqli_query($conn, $commentsQuery) or die("Query failed: " . mysqli_error($conn));
+
 ?>
 
 <html>
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Fry Me to the Moon</title>
+    <title>Admin Panel - Fry Me to the Moon</title>
     <link rel="icon" href="../lib/assets/strawberry.png" />
     <link href="../lib/css/output.css" rel="stylesheet" />
 </head>
@@ -37,9 +41,9 @@ $posts = mysqli_query($conn, $postsQuery) or die("Query failed: " . mysqli_error
 
 <body>
     <!-- NAV START -->
-    <nav class="container flex justify-between px-8 py-8 mx-auto bg-white">
+    <nav class="fixed z-40 flex items-center justify-between w-full px-8 py-4 mx-auto text-black bg-transparent backdrop-blur-sm">
         <div>
-            <h3 class="text-purple-600 h3">Fry Me to the Moon</h3>
+            <img src="../lib/assets/strawberry.png" alt="egg" class="w-12 rounded-full aspect-auto">
         </div>
         <div class="flex space-x-8">
             <a href="../">Back</a>
@@ -67,7 +71,7 @@ $posts = mysqli_query($conn, $postsQuery) or die("Query failed: " . mysqli_error
 
             <!-- Create chart of posts in last 14 days -->
             <h3 class="h3">Posts Over Last 14 Days</h3>
-            <canvas id="myChart" width="400" height="200"></canvas>
+            <canvas id="myChart" width="500" height="200"></canvas>
             <script>
                 var ctx = document.getElementById('myChart').getContext('2d');
                 var myChart = new Chart(ctx, {
@@ -138,30 +142,77 @@ $posts = mysqli_query($conn, $postsQuery) or die("Query failed: " . mysqli_error
                 });
             </script>
 
-            <!-- Create chart of posts by category -->
-            <canvas id="myChart2" width="400" height="400"></canvas>
+            <!-- Create chart of comments in last 14 days -->
+            <h3 class="mt-4 h3">Comments Over Last 14 Days</h3>
+            <canvas id="myChart2" width="500" height="200"></canvas>
             <script>
                 var ctx = document.getElementById('myChart2').getContext('2d');
                 var myChart = new Chart(ctx, {
-                    type: 'doughnut',
+                    type: 'line',
                     data: {
                         labels: [
                             <?php
-                            // Get all categories
-                            $categoriesQuery = "SELECT * FROM categories";
-                            $categories = mysqli_query($conn, $categoriesQuery) or die("Query failed: " . mysqli_error($conn));
+                            // Get the day for each comment
+                            $commentsPerDay = array();
+                            foreach ($days as $day) {
+                                $commentsPerDay[$day] = 0;
+                            }
+                            while ($row = mysqli_fetch_assoc($comments)) {
+                                $date = date("M d, Y", strtotime($row['created_at']));
 
-                            // Get the name of each category
-                            while ($row = mysqli_fetch_assoc($categories)) {
-                                echo "'$row[name]', ";
+                                if (array_key_exists($date, $commentsPerDay)) {
+                                    $commentsPerDay[$date]++;
+                                }
+                            }
+                            // Create labels for chart
+                            $commentsPerDay = array_reverse($commentsPerDay);
+                            foreach ($commentsPerDay as $day => $count) {
+                                echo "'$day', ";
                             }
                             ?>
                         ],
+                        datasets: [{
+                            label: '# of Comments',
+                            data: [
+                                <?php
+                                // Create data for chart
+                                foreach ($commentsPerDay as $day => $count) {
+                                    echo "$count, ";
+                                }
+                                ?>
+                            ],
+                            borderColor: [
+                                'rgba(147, 51, 234, 1)',
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        elements: {
+                            line: {
+                                tension: 0
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                },
+                            }
+                        }
                     }
                 });
             </script>
         </div>
         <!-- STATS END -->
+
+        <br />
     </div>
     <!-- ADMIN DASHBOARD END -->
 </body>

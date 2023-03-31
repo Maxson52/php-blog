@@ -48,7 +48,7 @@ if (isset($_POST['submit'])) {
 <html>
 
 <head>
-    <title>Fry Me to the Moon</title>
+    <title>Edit Category - Fry Me to the Moon</title>
     <link rel="icon" href="../../../lib/assets/strawberry.png" />
     <link href="../../../lib/css/output.css" rel="stylesheet" />
 </head>
@@ -56,9 +56,9 @@ if (isset($_POST['submit'])) {
 
 <body>
     <!-- NAV START -->
-    <nav class="container flex justify-between px-8 py-8 mx-auto bg-white">
+    <nav class="fixed z-40 flex items-center justify-between w-full px-8 py-4 mx-auto text-black bg-transparent backdrop-blur-sm">
         <div>
-            <h3 class="text-purple-600 h3">Fry Me to the Moon</h3>
+            <img src="../../../lib/assets/strawberry.png" alt="egg" class="w-12 rounded-full aspect-auto">
         </div>
         <div class="flex space-x-8">
             <a href="../">Back</a>
