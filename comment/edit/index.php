@@ -38,7 +38,7 @@ if (isset($_POST['submit'])) {
     $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
     if ($res) {
-        $redirect = $_GET['redirect'] ?? ('../../post/?id=' . $post_id);
+        $redirect = $_GET['redirect'] ?? ('../../post/?id=' . $post_id . '#comment_' . $_GET['id']);
         header("Location: $redirect");
     } else {
         $error = "Something went wrong";
@@ -54,6 +54,7 @@ if (isset($_POST['submit'])) {
     <title>Edit Comment - Fry Me to the Moon</title>
     <link rel="icon" href="../../lib/assets/strawberry.png" />
     <link href="../../lib/css/output.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/@tailwindcss/typography@0.1.2/dist/typography.min.css">
 </head>
 
 
@@ -92,7 +93,9 @@ if (isset($_POST['submit'])) {
                 <textarea id="editor" name="content"><?php echo $content ?></textarea>
                 <script>
                     ClassicEditor
-                        .create(document.querySelector('#editor'))
+                        .create(document.querySelector('#editor'), {
+                            toolbar: ['bold', 'italic', 'link']
+                        })
                         .then(editor => {
                             console.log(editor);
                             document.getElementsByClassName("ck-editor__main")[0].classList.add("prose");

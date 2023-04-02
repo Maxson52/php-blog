@@ -108,7 +108,7 @@ function estimateReadingTime($text, $wpm = 200)
                 <h2 class="pb-4 border-b h2">Your Comments</h2>
                 <div class="flex flex-col gap-2">
                     <?php foreach ($comments as $comment) : ?>
-                        <a href=" ../post/?id=<?= $comment['post_id'] ?>" class="w-full gap-2 p-4 font-serif border-b link">
+                        <a href=" ../post/?id=<?= $comment['post_id'] ?>#comment_<?= $comment['id'] ?>" class="w-full gap-2 p-4 font-serif border-b link">
                             <?= strip_tags($comment['content']) ?>
 
                         </a>

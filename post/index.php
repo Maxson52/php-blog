@@ -100,11 +100,11 @@ if (isset($_POST['submit'])) {
             <div class="flex justify-center gap-2 mb-12">
                 <img src='https://source.boringavatars.com/beam?name=<?= $row['author_id'] ?>' class='w-6 h-6 rounded-full' />
                 <p class="text-gray-500"><?= $author ?></p>
-                -
+                <span class="text-gray-500"> · </span>
                 <p class="text-gray-500"><?= $date ?></p>
 
                 <?php if ($_SESSION['user']['id'] == $row['author_id'] || $_SESSION['user']['role'] == 'admin') : ?>
-                    <span class="text-gray-400">- </span><a href="../post/edit?id=<?= $row['id'] ?>" class="link">Edit</a>
+                    <span class="text-gray-400">· </span><a href="../post/edit?id=<?= $row['id'] ?>" class="link">Edit</a>
                 <?php endif; ?>
             </div>
 
@@ -126,9 +126,8 @@ if (isset($_POST['submit'])) {
         </article>
         <!-- ARTICLE END -->
 
-        <!-- COMMENTS START -->
-        <div class="flex flex-col gap-2 min-w-[50%] max-w-6xl px-8">
-            <hr />
+        <div class="flex flex-col gap-8 min-w-[50%] max-w-2xl px-8">
+            <!-- COMMENTS START -->
             <div class="flex flex-col gap-2">
                 <?php foreach ($comments as $comment) : ?>
                     <?php
@@ -137,17 +136,24 @@ if (isset($_POST['submit'])) {
                     $date = date('M d, Y', strtotime($comment['created_at']));
                     ?>
 
-                    <div class="flex flex-col w-full gap-2 p-4 transition border-b ">
+                    <div class="flex flex-col w-full gap-2 p-4 transition border-b first:border-t" id="comment_<?= $comment['id'] ?>">
                         <div class="flex justify-between">
-                            <h3 class="h3"><?php echo $author ?></h3>
+                            <div class="flex items-center gap-2">
+                                <img src='https://source.boringavatars.com/beam?name=<?= $comment['author_id'] ?>' class='w-6 h-6 rounded-full' />
+                                <p><?php echo $author ?></p>
+                                <span class="text-gray-500"> · </span>
+                                <p class="text-gray-500"><?php echo $date ?></p>
+                            </div>
+
                             <?php if ($_SESSION['user']['id'] == $comment['author_id'] || $_SESSION['user']['role'] == 'admin') : ?>
                                 <a href="../comment/edit?id=<?= $comment['id'] ?>" class="link">Edit</a>
                             <?php endif; ?>
-                        </div>
-                        <p class="text-gray-500"><?php echo $date ?></p>
-                        <div class="font-serif prose"><?php echo $content ?></div>
 
+                        </div>
+
+                        <div class="font-serif prose"><?php echo $content ?></div>
                     </div>
+
                 <?php endforeach; ?>
                 <?php
                 if (mysqli_num_rows($comments) === 0) {
@@ -159,18 +165,19 @@ if (isset($_POST['submit'])) {
 
 
             <!-- COMMENT FORM START -->
-
             <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
 
             <div class="grid place-items-center">
-                <div class="flex flex-col gap-2 mb-12 min-w-[50%] max-w-6xl">
+                <div class="flex flex-col gap-2 mb-12 min-w-[50%] max-w-6xl w-full">
                     <p class="text-red-500"><?php echo $error ?></p>
 
-                    <form action="<?php echo $_SERVER['PHP_SELF'] . "?id=" . $_GET['id'] ?>" method="POST" class="flex flex-col gap-2">
+                    <form action="<?php echo $_SERVER['PHP_SELF'] . "?id=" . $_GET['id'] ?>" method="POST" class="flex flex-col w-full gap-2">
                         <textarea id="editor" name="content" placeholder="Write your comment..."></textarea>
                         <script>
                             ClassicEditor
-                                .create(document.querySelector('#editor'))
+                                .create(document.querySelector('#editor'), {
+                                    toolbar: ['bold', 'italic', 'link']
+                                })
                                 .then(editor => {
                                     console.log(editor);
                                     document.getElementsByClassName("ck-editor__main")[0].classList.add("prose");

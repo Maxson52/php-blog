@@ -75,7 +75,7 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
 
 
                         echo "<tr>
-                        <td class='px-4 py-2 border'><a class='link' href='../../post?id=$post_id'>$content</a></td>
+                        <td class='px-4 py-2 border'><a class='link' href='../../post?id=$post_id#comment_$id'>" .  strip_tags($content) . "</a></td>
                         <td class='px-4 py-2 border'>$visible</td>
                         <td class='px-4 py-2 border'>$date</td>
                         <td class='px-4 py-2 border'>$author</td>

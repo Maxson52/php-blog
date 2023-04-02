@@ -43,6 +43,7 @@ if (isset($_POST['submit'])) {
     <title>Create Post - Fry Me to the Moon</title>
     <link rel="icon" href="../../lib/assets/strawberry.png" />
     <link href="../../lib/css/output.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/@tailwindcss/typography@0.1.2/dist/typography.min.css">
 </head>
 
 
@@ -73,7 +74,19 @@ if (isset($_POST['submit'])) {
                 <textarea id="editor" name="content" placeholder="Tell your story..."></textarea>
                 <script>
                     ClassicEditor
-                        .create(document.querySelector('#editor'))
+                        .create(document.querySelector('#editor'), {
+                            toolbar: {
+                                items: [
+                                    'undo', 'redo',
+                                    '|', 'heading',
+                                    '|', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor',
+                                    '|', 'bold', 'italic',
+                                    '|', 'link', 'uploadImage', 'blockQuote',
+                                    '|', 'bulletedList', 'numberedList', 'outdent', 'indent'
+                                ],
+                                shouldNotGroupWhenFull: true
+                            }
+                        })
                         .then(editor => {
                             console.log(editor);
                             document.getElementsByClassName("ck-editor__main")[0].classList.add("prose");
