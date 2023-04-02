@@ -15,8 +15,27 @@ if ($_SESSION['user']['role'] !== 'admin') {
 // Get all posts from DB
 require_once('../../lib/utils/conn.php');
 
-$query = "SELECT posts.id, posts.title, posts.created_at, posts.visible, users.name FROM posts JOIN users ON posts.author_id = users.id ORDER BY posts.created_at DESC";
-$res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
+if (isset($_GET['search']) && $_GET['search'] === '') header("Location: ./");
+$search = mysqli_real_escape_string($conn, $_GET['search'] ?? '');
+
+$query = "SELECT posts.id, posts.title, posts.created_at, posts.visible, users.name, categories.name AS category 
+        FROM posts 
+        JOIN users ON posts.author_id = users.id 
+        JOIN categories ON posts.category_id = categories.id 
+        WHERE (posts.title LIKE '%$search%' OR categories.name LIKE '%$search%' OR users.name LIKE '%$search%')
+        ORDER BY posts.created_at DESC";
+$dbRes = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
+$res = [];
+
+// Highlight search terms
+while ($row = mysqli_fetch_array($dbRes)) {
+    if (isset($_GET['search'])) {
+        $row['title'] = preg_replace('/(' . $search . ')/i', '<mark>$1</mark>', $row['title']);
+        $row['category'] = preg_replace('/(' . $search . ')/i', '<mark>$1</mark>', $row['category']);
+        $row['name'] = preg_replace('/(' . $search . ')/i', '<mark>$1</mark>', $row['name']);
+    }
+    $res[] = $row;
+}
 
 ?>
 
@@ -49,6 +68,18 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
         <div class="flex flex-col gap-2 mt-24 min-w-[50%] max-w-6xl">
             <h1 class="h1">Admin Panel - Manage Posts</h1>
 
+            <!-- SEARCH START -->
+            <form method="GET" action="./" class="flex flex-wrap gap-2">
+                <input type="text" class="w-full border-gray-300 rounded-full text-input" name="search" placeholder="Search" value="<?= $_GET['search'] ?? '' ?>">
+                <div class="flex justify-end w-full gap-2">
+                    <input type="submit" value="Submit" class="px-3 py-1 rounded-full cursor-pointer bg-neutral-200 w-min">
+                    <a href="./" class="px-3 py-1 bg-gray-100 rounded-full w-min">
+                        Clear
+                    </a>
+                </div>
+            </form>
+            <!-- SEARCH END -->
+
             <table class="table-auto">
                 <thead class="text-left">
                     <tr>
@@ -61,8 +92,9 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
                 </thead>
                 <tbody>
                     <?php
-                    while ($row = mysqli_fetch_array($res)) {
+                    foreach ($res as $row) {
                         $title = $row['title'];
+                        $category = $row['category'];
                         $visible = $row['visible'] ? "Visible" : "Hidden";
                         $date = date('M d, Y', strtotime($row['created_at']));
                         $author = $row['name'];
@@ -71,6 +103,7 @@ $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn)
 
                         echo "<tr>
                         <td class='px-4 py-2 border'>$title</td>
+                        <td class='px-4 py-2 border'>$category</td>
                         <td class='px-4 py-2 border'>$visible</td>
                         <td class='px-4 py-2 border'>$date</td>
                         <td class='px-4 py-2 border'>$author</td>
