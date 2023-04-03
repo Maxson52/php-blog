@@ -84,6 +84,7 @@ while ($row = mysqli_fetch_array($dbRes)) {
                 <thead class="text-left">
                     <tr>
                         <th class="px-4 py-2">Title</th>
+                        <th class="px-4 py-2">Category</th>
                         <th class="px-4 py-2">Visibility</th>
                         <th class="px-4 py-2">Published Date</th>
                         <th class="px-4 py-2">Author</th>

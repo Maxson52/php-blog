@@ -64,17 +64,33 @@ $comments = mysqli_query($conn, $commentsQuery) or die("Query failed: " . mysqli
         </div>
 
         <!-- STATS START -->
-        <div class="flex flex-col gap-2 min-w-[50%] max-w-6xl">
+        <div class="flex flex-col gap-4 min-w-[50%] max-w-6xl">
 
             <h2 class="h2">Stats For Nerds</h2>
+
+            <div class="flex items-center justify-between w-full">
+                <div class="text-center">
+                    <h3 class="h3">Total Users</h3>
+                    <p class="p"><?php echo mysqli_num_rows($res); ?></p>
+                </div>
+                <div class="text-center">
+                    <h3 class="h3">Total Posts</h3>
+                    <p class="p"><?php echo mysqli_num_rows($posts); ?></p>
+                </div>
+                <div class="text-center">
+                    <h3 class="h3">Total Comments</h3>
+                    <p class="p"><?php echo mysqli_num_rows($comments); ?></p>
+                </div>
+            </div>
+
             <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
 
             <!-- Create chart of posts in last 14 days -->
             <h3 class="h3">Posts Over Last 14 Days</h3>
             <canvas id="myChart" width="500" height="200"></canvas>
             <script>
-                var ctx = document.getElementById('myChart').getContext('2d');
-                var myChart = new Chart(ctx, {
+                let ctx = document.getElementById('myChart').getContext('2d');
+                let myChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: [
@@ -146,8 +162,8 @@ $comments = mysqli_query($conn, $commentsQuery) or die("Query failed: " . mysqli
             <h3 class="mt-4 h3">Comments Over Last 14 Days</h3>
             <canvas id="myChart2" width="500" height="200"></canvas>
             <script>
-                var ctx = document.getElementById('myChart2').getContext('2d');
-                var myChart = new Chart(ctx, {
+                let ctx2 = document.getElementById('myChart2').getContext('2d');
+                let myChart2 = new Chart(ctx2, {
                     type: 'line',
                     data: {
                         labels: [

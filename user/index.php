@@ -88,7 +88,7 @@ function estimateReadingTime($text, $wpm = 200)
                             <?php if (!$post['visible']) : ?>
                                 <p class='font-bold text-red-500'>This post is invisible.</p>
                             <?php endif; ?>
-                            <p class='pb-4 font-serif'><?= strip_tags(substr($post['content'], 0, 100)) ?>...</p>
+                            <p class='pb-4 font-serif'><?= (substr(strip_tags($post['content']), 0, 100)) ?>...</p>
                             <div class='flex items-center gap-2 text-sm'>
                                 <?php if ($post['cat_visible']) echo "<p class='px-3 py-1 bg-gray-100 rounded-full w-min'>" . $post['category'] . "</p>" ?>
                                 <p class='text-gray-400'><?= estimateReadingTime($post['content']) ?> min read</p>

@@ -40,6 +40,27 @@ if (isset($_POST['submit'])) {
     header("Location: $redirect");
 }
 
+// If password form submitted
+$passwordError = "";
+$success = "";
+
+if (isset($_POST['submitPassword'])) {
+    $password = $_POST['password'];
+    $confirmPassword = $_POST['confirm-password'];
+
+    if ($password !== $confirmPassword) {
+        $passwordError = "Passwords do not match";
+    } else {
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        $insertQuery = "INSERT INTO `users` (`password`) VALUES ('$hashedPassword')";
+
+        mysqli_query($conn, $insertQuery) or die("Query Error: " . mysqli_error($conn));
+
+        $success = "Password updated successfully";
+    }
+}
+
 ?>
 
 <html>
@@ -68,7 +89,7 @@ if (isset($_POST['submit'])) {
     <!-- EDIT USER START -->
     <div class="grid place-items-center">
         <div class="flex flex-col gap-2 mt-24 min-w-[50%] max-w-6xl">
-            <h1 class="h1">Edit user</h1>
+            <h1 class="h1">Edit Profile</h1>
 
             <p class="text-red-500"><?php echo $error ?></p>
 
@@ -86,8 +107,26 @@ if (isset($_POST['submit'])) {
                     </select>
                 <?php endif; ?>
 
-                <input class="button" type="submit" name="submit" value="Update user" />
+                <input class="button" type="submit" name="submit" value="Update" />
             </form>
+
+            <!-- If user is session id then allow password reset -->
+            <?php if ($_SESSION['user']['id'] === $_GET['id']) : ?>
+
+                <h1 class="h1">Password Reset</h1>
+
+                <p class="text-red-500"><?php echo $passwordError ?></p>
+                <p class="text-green-600"><?php echo $success ?></p>
+
+                <form action="<?php echo $_SERVER['PHP_SELF'] . "?id=" . $_GET['id'] ?>" method="POST" class="flex flex-col gap-2">
+                    <input class="text-input" type="password" name="password" placeholder="Enter new password" required minlength="3">
+                    <input class="text-input" type="password" name="confirm-password" placeholder="Confirm new password" required minlength="3">
+
+                    <input class="button" type="submit" name="submitPassword" value="Update Password" />
+                </form>
+
+            <?php endif; ?>
+
         </div>
     </div>
 

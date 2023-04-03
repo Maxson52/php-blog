@@ -115,7 +115,7 @@ if (isset($_POST['submit'])) {
                                     '|', 'heading',
                                     '|', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor',
                                     '|', 'bold', 'italic',
-                                    '|', 'link', 'uploadImage', 'blockQuote',
+                                    '|', 'link', 'blockQuote',
                                     '|', 'bulletedList', 'numberedList', 'outdent', 'indent'
                                 ],
                                 shouldNotGroupWhenFull: true
