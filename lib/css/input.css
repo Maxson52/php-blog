@@ -22,7 +22,7 @@
   }
 
   .text-input {
-    @apply px-3 py-2 border-2 border-gray-300 outline-none rounded-full transition-all focus:outline-none focus:border-purple-600;
+    @apply px-3 py-2 border-2 border-gray-300 outline-none rounded-full transition-colors focus:outline-none focus:border-purple-600;
   }
 
   .select-input {

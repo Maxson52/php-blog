@@ -18,12 +18,17 @@ require_once('../../lib/utils/conn.php');
 if (isset($_GET['search']) && $_GET['search'] === '') header("Location: ./");
 $search = mysqli_real_escape_string($conn, $_GET['search'] ?? '');
 
+$cols = ['posts.title', 'categories.name', 'posts.visible', 'posts.created_at', 'users.name'];
+
+$orderBy = isset($cols[$_GET['orderBy'] ?? -1]) ? $cols[$_GET['orderBy']] : 'posts.created_at';
+$sortOrder = isset($_GET['asc']) ? 'ASC' : 'DESC';
+
 $query = "SELECT posts.id, posts.title, posts.created_at, posts.visible, users.name, categories.name AS category 
         FROM posts 
         JOIN users ON posts.author_id = users.id 
         JOIN categories ON posts.category_id = categories.id 
         WHERE (posts.title LIKE '%$search%' OR categories.name LIKE '%$search%' OR users.name LIKE '%$search%')
-        ORDER BY posts.created_at DESC";
+        ORDER BY $orderBy $sortOrder";
 $dbRes = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 $res = [];
 
@@ -80,15 +85,47 @@ while ($row = mysqli_fetch_array($dbRes)) {
             </form>
             <!-- SEARCH END -->
 
+            <script>
+                function update(orderByIndex) {
+                    let searchParams = new URLSearchParams(window.location.search);
+
+                    if (searchParams.get('orderBy') == orderByIndex) {
+                        if (searchParams.get('asc')) {
+                            searchParams.delete('asc');
+                        } else {
+                            searchParams.set('asc', '1');
+                        }
+                    } else {
+                        searchParams.set('orderBy', orderByIndex);
+                    }
+
+                    window.location.search = searchParams.toString();
+                }
+            </script>
+            <?php
+            function getSortIcon($index)
+            {
+                if (isset($_GET['orderBy']) && $_GET['orderBy'] == $index) {
+                    if (isset($_GET['asc'])) {
+                        return '▲';
+                    } else {
+                        return '▼';
+                    }
+                } else {
+                    return '';
+                }
+            }
+            ?>
+
             <table class="table-auto">
                 <thead class="text-left">
                     <tr>
-                        <th class="px-4 py-2">Title</th>
-                        <th class="px-4 py-2">Category</th>
-                        <th class="px-4 py-2">Visibility</th>
-                        <th class="px-4 py-2">Published Date</th>
-                        <th class="px-4 py-2">Author</th>
-                        <th class="px-4 py-2">Edit</th>
+                        <th class="px-4 py-2 cursor-pointer" onclick="update('0')">Title <?= getSortIcon(0) ?></th>
+                        <th class="px-4 py-2 cursor-pointer" onclick="update('1')">Category <?= getSortIcon(1) ?></th>
+                        <th class="px-4 py-2 cursor-pointer" onclick="update('2')">Visibility <?= getSortIcon(2) ?></th>
+                        <th class="px-4 py-2 cursor-pointer" onclick="update('3')">Published Date <?= getSortIcon(3) ?></th>
+                        <th class="px-4 py-2 cursor-pointer" onclick="update('4')">Author <?= getSortIcon(4) ?></th>
+                        <th class="px-4 py-2 cursor-pointer">Edit</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -114,6 +151,7 @@ while ($row = mysqli_fetch_array($dbRes)) {
                     ?>
                 </tbody>
             </table>
+
         </div>
     </div>
 

@@ -18,11 +18,16 @@ require_once('../../lib/utils/conn.php');
 if (isset($_GET['search']) && $_GET['search'] === '') header("Location: ./");
 $search = mysqli_real_escape_string($conn, $_GET['search'] ?? '');
 
+$cols = ['comments.content', 'comments.visible', 'comments.created_at', 'users.name'];
+
+$orderBy = isset($cols[$_GET['orderBy'] ?? -1]) ? $cols[$_GET['orderBy']] : 'comments.created_at';
+$sortOrder = isset($_GET['asc']) ? 'ASC' : 'DESC';
+
 $query = "SELECT comments.id, comments.content, comments.visible, comments.created_at, users.name, comments.post_id 
           FROM comments 
           JOIN users ON comments.author_id = users.id 
           JOIN posts ON comments.post_id = posts.id 
-          ORDER BY comments.created_at DESC";
+          ORDER BY $orderBy $sortOrder";
 $dbRes = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 $res = [];
 
@@ -77,13 +82,45 @@ while ($row = mysqli_fetch_array($dbRes)) {
             </form>
             <!-- SEARCH END -->
 
+            <script>
+                function update(orderByIndex) {
+                    let searchParams = new URLSearchParams(window.location.search);
+
+                    if (searchParams.get('orderBy') == orderByIndex) {
+                        if (searchParams.get('asc')) {
+                            searchParams.delete('asc');
+                        } else {
+                            searchParams.set('asc', '1');
+                        }
+                    } else {
+                        searchParams.set('orderBy', orderByIndex);
+                    }
+
+                    window.location.search = searchParams.toString();
+                }
+            </script>
+            <?php
+            function getSortIcon($index)
+            {
+                if (isset($_GET['orderBy']) && $_GET['orderBy'] == $index) {
+                    if (isset($_GET['asc'])) {
+                        return '▲';
+                    } else {
+                        return '▼';
+                    }
+                } else {
+                    return '';
+                }
+            }
+            ?>
+
             <table class="table-auto">
                 <thead class="text-left">
                     <tr>
-                        <th class="px-4 py-2">Content</th>
-                        <th class="px-4 py-2">Visibility</th>
-                        <th class="px-4 py-2">Published Date</th>
-                        <th class="px-4 py-2">Author</th>
+                        <th class="px-4 py-2 cursor-pointer" onclick="update('0')">Content <?= getSortIcon(0) ?></th>
+                        <th class="px-4 py-2 cursor-pointer" onclick="update('1')">Visibility <?= getSortIcon(1) ?></th>
+                        <th class="px-4 py-2 cursor-pointer" onclick="update('2')">Published Date <?= getSortIcon(2) ?></th>
+                        <th class="px-4 py-2 cursor-pointer" onclick="update('3')">Author <?= getSortIcon(3) ?></th>
                         <th class="px-4 py-2">Edit</th>
                     </tr>
                 </thead>

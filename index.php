@@ -11,7 +11,7 @@ if (!isset($_SESSION['user'])) {
 require_once('./lib/utils/conn.php');
 
 $category = $_GET['category'] ?? -1;
-$sort_order = $_GET['sort_order'] ?? 'DESC';
+$sortOrder = isset($_GET['asc']) ? 'ASC' : 'DESC';
 
 if (!is_numeric($category)) header("Location: ./");
 if (isset($_GET['search']) && $_GET['search'] === '') header("Location: ./");
@@ -24,7 +24,7 @@ $query = "SELECT posts.id, posts.title, posts.content, posts.created_at, posts.a
             WHERE posts.visible = 1 
             AND (posts.category_id = $category OR $category = -1)
             AND (posts.title LIKE '%$search%' OR posts.content LIKE '%$search%' OR users.name LIKE '%$search%')
-            ORDER BY posts.created_at $sort_order";
+            ORDER BY posts.created_at $sortOrder";
 
 
 $dbRes = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
@@ -171,7 +171,7 @@ function estimateReadingTime($text, $wpm = 200)
       <div class="lg:col-start-3">
         <script>
           function update(a, b) {
-            var searchParams = new URLSearchParams(window.location.search);
+            let searchParams = new URLSearchParams(window.location.search);
             if (b != '')
               searchParams.set(a, b);
             else
@@ -195,10 +195,10 @@ function estimateReadingTime($text, $wpm = 200)
         <hr class="my-4" />
         <!-- LIST SORT ORDER START -->
         <div class="flex flex-wrap gap-2">
-          <a onclick="update('sort_order', '');" href="javascript:void(0)" class="px-3 py-1 rounded-full w-fit <?= (isset($_GET['sort_order']) ? "bg-gray-100" : "bg-neutral-200") ?>">
+          <a onclick="update('asc', '');" href="javascript:void(0)" class="px-3 py-1 rounded-full w-fit <?= (isset($_GET['asc']) ? "bg-gray-100" : "bg-neutral-200") ?>">
             Newest First
           </a>
-          <a onclick="update('sort_order', 'ASC');" href="javascript:void(0)" class="px-3 py-1 rounded-full w-fit <?= (!isset($_GET['sort_order']) ? "bg-gray-100" : "bg-neutral-200") ?>">
+          <a onclick="update('asc', 'true');" href="javascript:void(0)" class="px-3 py-1 rounded-full w-fit <?= (!isset($_GET['asc']) ? "bg-gray-100" : "bg-neutral-200") ?>">
             Oldest First
           </a>
         </div>
