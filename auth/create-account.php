@@ -19,7 +19,10 @@ if (isset($_POST['submit'])) {
     $matchingEmails = "SELECT * FROM `users` WHERE `email`='$email'";
     $res = mysqli_query($conn, $matchingEmails) or die("Query failed: " . mysqli_error($conn));
 
-    if (mysqli_num_rows($res) > 0) {
+    $validate = validateAll($name, $email, $password);
+    if (isset($validate) && is_string($validate)) {
+        $error = $validate;
+    } else if (mysqli_num_rows($res) > 0) {
         $error = "Account with that email already exists";
     } else {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -32,6 +35,21 @@ if (isset($_POST['submit'])) {
     }
 
     $_POST = [];
+}
+
+function validateAll($name, $email, $password)
+{
+    if (strlen($name) < 2 || !preg_match("/^[a-zA-Z-' ]*$/", $name)) {
+        return "Invalid name";
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return "Invalid email";
+    }
+    if (strlen($password) < 5) {
+        return "Your password must contain at least 5 characters";
+    }
+
+    return null;
 }
 ?>
 <html>
@@ -55,7 +73,7 @@ if (isset($_POST['submit'])) {
 
                 <input class="text-input" type="email" name="email" placeholder="Enter your email" required>
 
-                <input class="text-input" type="password" name="password" placeholder="Enter your password" required>
+                <input class="text-input" type="password" name="password" placeholder="Enter your password" required minlength="5">
 
                 <input class="button" type="submit" name="submit" value="Create account" />
             </form>

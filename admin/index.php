@@ -19,13 +19,17 @@ $query = "SELECT * FROM users";
 $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
 // --------------------- STATS ---------------------
-// Get all posts from DB
-$postsQuery = "SELECT * FROM posts";
+// Get all posts with their category name from DB
+$postsQuery = "SELECT posts.title, posts.created_at, categories.name AS category FROM posts JOIN categories ON posts.category_id = categories.id";
 $posts = mysqli_query($conn, $postsQuery) or die("Query failed: " . mysqli_error($conn));
 
 // Get all comments from DB
 $commentsQuery = "SELECT * FROM comments";
 $comments = mysqli_query($conn, $commentsQuery) or die("Query failed: " . mysqli_error($conn));
+
+// Get all categories from DB
+$categoriesQuery = "SELECT * FROM categories";
+$categories = mysqli_query($conn, $categoriesQuery) or die("Query failed: " . mysqli_error($conn));
 
 ?>
 
@@ -227,6 +231,67 @@ $comments = mysqli_query($conn, $commentsQuery) or die("Query failed: " . mysqli
                     }
                 });
             </script>
+
+
+            <!-- Create pie chart of post category -->
+            <h3 class="mt-4 h3">Posts By Category</h3>
+            <canvas id="myChart3" width="500" height="200"></canvas>
+            <script>
+                let ctx3 = document.getElementById('myChart3').getContext('2d');
+                let myChart3 = new Chart(ctx3, {
+                    type: 'pie',
+                    data: {
+                        labels: [
+                            <?php
+                            $cats = [];
+                            while ($row = mysqli_fetch_assoc($categories)) {
+                                array_push($cats, $row['name']);
+                            }
+                            array_unique($cats);
+                            foreach ($cats as $cat) {
+                                echo "'$cat', ";
+                            }
+                            ?>
+                        ],
+                        datasets: [{
+                            label: '# of Posts',
+                            data: [
+                                <?php
+                                foreach ($cats as $cat) {
+                                    $count = 0;
+
+                                    mysqli_data_seek($posts, 0);
+
+                                    while ($row = mysqli_fetch_assoc($posts)) {
+                                        if ($row['category'] == $cat) $count++;
+                                    }
+
+                                    echo $count . ',';
+                                }
+                                ?>
+                            ],
+                            backgroundColor: [
+                                'rgb(123,104,238)',
+                                'rgb(147,112,219)',
+                                'rgb(106,90,205)',
+                                'rgb(186,85,211)',
+                                'rgb(138,43,226)',
+                                'rgb(153,50,204)',
+                                'rgb(148,0,211)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            </script>
+
         </div>
         <!-- STATS END -->
 
