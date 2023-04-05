@@ -141,7 +141,7 @@ while ($row = mysqli_fetch_array($dbRes)) {
 
 
                         echo "<tr>
-                        <td class='px-4 py-2 border'>$title</td>
+                        <td class='px-4 py-2 border'><a class='link' href='../../post?id=$id'>$title</a></td>
                         <td class='px-4 py-2 border'>$category</td>
                         <td class='px-4 py-2 border'>$visible</td>
                         <td class='px-4 py-2 border'>$date</td>
