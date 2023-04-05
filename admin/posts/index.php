@@ -28,6 +28,7 @@ $query = "SELECT posts.id, posts.title, posts.created_at, posts.visible, users.n
         JOIN users ON posts.author_id = users.id 
         JOIN categories ON posts.category_id = categories.id 
         WHERE (posts.title LIKE '%$search%' OR categories.name LIKE '%$search%' OR users.name LIKE '%$search%')
+        AND posts.title NOT LIKE '[deleted]'
         ORDER BY $orderBy $sortOrder";
 $dbRes = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 $res = [];

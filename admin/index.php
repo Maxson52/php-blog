@@ -57,10 +57,12 @@ $comments = mysqli_query($conn, $commentsQuery) or die("Query failed: " . mysqli
         <div class="flex flex-col gap-2 mt-24 min-w-[50%] max-w-6xl">
             <h1 class="h1">Admin Panel</h1>
 
-            <a href="users" class="link">Manage Users</a>
-            <a href="posts" class="link">Manage Posts</a>
-            <a href="comments" class="link">Manage Comments</a>
-            <a href="categories" class="link">Manage Categories</a>
+            <div class="flex flex-wrap gap-4">
+                <a href="users" class="link">Manage Users</a>·
+                <a href="posts" class="link">Manage Posts</a>·
+                <a href="comments" class="link">Manage Comments</a>·
+                <a href="categories" class="link">Manage Categories</a>
+            </div>
         </div>
 
         <!-- STATS START -->

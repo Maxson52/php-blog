@@ -22,6 +22,7 @@ $query = "SELECT posts.id, posts.title, posts.content, posts.created_at, posts.a
             JOIN users ON posts.author_id = users.id 
             JOIN categories ON posts.category_id = categories.id
             WHERE posts.visible = 1 
+            AND posts.title NOT LIKE '[deleted]'
             AND (posts.category_id = $category OR $category = -1)
             AND (posts.title LIKE '%$search%' OR posts.content LIKE '%$search%' OR users.name LIKE '%$search%')
             ORDER BY posts.created_at $sortOrder";

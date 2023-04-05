@@ -103,7 +103,7 @@ if (isset($_POST['submit'])) {
                 <span class="text-gray-500"> · </span>
                 <p class="text-gray-500"><?= $date ?></p>
 
-                <?php if ($_SESSION['user']['id'] == $row['author_id'] || $_SESSION['user']['role'] == 'admin') : ?>
+                <?php if (strpos($title, '[deleted]') === false && ($_SESSION['user']['id'] == $row['author_id'] || $_SESSION['user']['role'] == 'admin')) : ?>
                     <span class="text-gray-400">· </span><a href="../post/edit?id=<?= $row['id'] ?>" class="link">Edit</a>
                 <?php endif; ?>
             </div>
@@ -171,25 +171,28 @@ if (isset($_POST['submit'])) {
                 <div class="flex flex-col gap-2 mb-12 min-w-[50%] max-w-6xl w-full">
                     <p class="text-red-500"><?php echo $error ?></p>
 
-                    <form action="<?php echo $_SERVER['PHP_SELF'] . "?id=" . $_GET['id'] ?>" method="POST" class="flex flex-col w-full gap-2">
-                        <textarea id="editor" name="content" placeholder="Write your comment..."></textarea>
-                        <script>
-                            ClassicEditor
-                                .create(document.querySelector('#editor'), {
-                                    toolbar: ['bold', 'italic', 'link']
-                                })
-                                .then(editor => {
-                                    console.log(editor);
-                                    document.getElementsByClassName("ck-editor__main")[0].classList.add("prose");
-                                    document.getElementsByClassName("ck-editor__main")[0].style.maxWidth = "none";
-                                })
-                                .catch(error => {
-                                    console.error(error);
-                                });
-                        </script>
+                    <!-- Only show form if post isn't deleted -->
+                    <?php if (strpos($title, '[deleted]') === false) : ?>
+                        <form action="<?php echo $_SERVER['PHP_SELF'] . "?id=" . $_GET['id'] ?>" method="POST" class="flex flex-col w-full gap-2">
+                            <textarea id="editor" name="content" placeholder="Write your comment..."></textarea>
+                            <script>
+                                ClassicEditor
+                                    .create(document.querySelector('#editor'), {
+                                        toolbar: ['bold', 'italic', 'link']
+                                    })
+                                    .then(editor => {
+                                        console.log(editor);
+                                        document.getElementsByClassName("ck-editor__main")[0].classList.add("prose");
+                                        document.getElementsByClassName("ck-editor__main")[0].style.maxWidth = "none";
+                                    })
+                                    .catch(error => {
+                                        console.error(error);
+                                    });
+                            </script>
 
-                        <input class="button" type="submit" name="submit" value="Comment" />
-                    </form>
+                            <input class="button" type="submit" name="submit" value="Comment" />
+                        </form>
+                    <?php endif; ?>
                 </div>
             </div>
 

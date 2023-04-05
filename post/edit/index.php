@@ -38,10 +38,28 @@ if (isset($_POST['submit'])) {
     $newVisibility = $_POST['visibility'] ?? $visible;
     $newCategory = $_POST['category'];
 
-    $escapedTitle = mysqli_real_escape_string($conn, $newTitle);
-    $escapedContent = mysqli_real_escape_string($conn, $newContent);
+    // Error if new title contains [deleted]
+    if (strpos($newTitle, '[deleted]') !== false) {
+        $error = "Title cannot contain '[deleted]'";
+    } else {
+        $escapedTitle = mysqli_real_escape_string($conn, $newTitle);
+        $escapedContent = mysqli_real_escape_string($conn, $newContent);
 
-    $query = "UPDATE posts SET title = '$escapedTitle', content = '$escapedContent', visible = '$newVisibility', category_id = '$newCategory' WHERE id = " . $_GET['id'];
+        $query = "UPDATE posts SET title = '$escapedTitle', content = '$escapedContent', visible = '$newVisibility', category_id = '$newCategory' WHERE id = " . $_GET['id'];
+        $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
+
+        if ($res) {
+            $redirect = $_GET['redirect'] ?? ('../?id=' . $_GET['id']);
+            header("Location: $redirect");
+        } else {
+            $error = "Something went wrong";
+        }
+    }
+}
+
+// Delete post by making the title [deleted]
+if (isset($_POST['delete'])) {
+    $query = "UPDATE posts SET title = '[deleted]' WHERE id = " . $_GET['id'];
     $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 
     if ($res) {
@@ -137,6 +155,8 @@ if (isset($_POST['submit'])) {
                 </style>
 
                 <input class="button" type="submit" name="submit" value="Update" />
+                <!-- DELETE BUTTON -->
+                <input class="bg-red-500 border-red-500 button" type="submit" name="delete" value="Delete" />
             </form>
         </div>
     </div>

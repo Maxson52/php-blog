@@ -23,15 +23,21 @@ if (isset($_POST['submit'])) {
     $author_id = $_SESSION['user']['id'];
     $category_id = $_POST['category'];
 
-    $escapedTitle = mysqli_real_escape_string($conn, $title);
-    $escapedContent = mysqli_real_escape_string($conn, $content);
+    // Error if title contains [deleted]
+    if (strpos($title, '[deleted]') !== false) {
+        $error = "Title cannot contain '[deleted]'";
+    } else {
 
-    // Insert into db
-    $query = "INSERT INTO posts (title, content, author_id, category_id) VALUES ('$escapedTitle', '$escapedContent', '$author_id', '$category_id')";
-    $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
+        $escapedTitle = mysqli_real_escape_string($conn, $title);
+        $escapedContent = mysqli_real_escape_string($conn, $content);
 
-    // Redirect to home
-    header("Location: ../../");
+        // Insert into db
+        $query = "INSERT INTO posts (title, content, author_id, category_id) VALUES ('$escapedTitle', '$escapedContent', '$author_id', '$category_id')";
+        $res = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
+
+        // Redirect to home
+        header("Location: ../../");
+    }
 }
 
 ?>

@@ -19,7 +19,9 @@ $row = mysqli_fetch_assoc($res);
 // Get all posts
 $postQuery = "SELECT posts.id, posts.title, posts.content, posts.created_at, posts.visible, categories.name AS category, categories.visible AS cat_visible FROM posts 
             JOIN categories ON posts.category_id = categories.id 
-            WHERE author_id = $uid";
+            WHERE author_id = $uid
+            AND posts.title NOT LIKE '[deleted]'
+            ORDER BY posts.created_at DESC";
 $posts = mysqli_query($conn, $postQuery) or die("Query failed: " . mysqli_error($conn));
 
 // Get all comments on visible posts
