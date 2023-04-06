@@ -155,7 +155,7 @@ function estimateReadingTime($text, $wpm = 200)
             <h2 class='h2'><?= $article['title'] ?></h2>
             <p class='pb-4 font-serif'><?= (substr(strip_tags($article['content'], ['mark']), 0, 225)) ?>...</p>
             <div class='flex items-center gap-2 text-sm'>
-              <?php if ($article['cat_visible']) echo "<p class='px-3 py-1 bg-gray-100 rounded-full w-min'>" . $article['category'] . "</p>" ?>
+              <?php if ($article['cat_visible']) echo "<p class='px-3 py-1 bg-gray-100 rounded-full w-fit'>" . $article['category'] . "</p>" ?>
               <p class='text-gray-400'><?= estimateReadingTime($article['content']) ?> min read</p>
             </div>
           </a>
@@ -169,7 +169,7 @@ function estimateReadingTime($text, $wpm = 200)
       <!-- LIST ARTICLES END -->
 
       <!-- FILTERS START -->
-      <div class="lg:col-start-3">
+      <div class="lg:col-start-3 lg:h-min lg:top-24 lg:sticky">
         <script>
           function update(a, b) {
             let searchParams = new URLSearchParams(window.location.search);
