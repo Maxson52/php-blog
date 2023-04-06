@@ -22,6 +22,7 @@ if (isset($_POST['submit'])) {
         $error = "Email or password is incorrect";
     } else {
         $userInfo = mysqli_fetch_array($res);
+
         if ($userInfo['role'] === "deleted") {
             $error = "Your account has been deleted. Contact us if you think it was by mistake";
         } else {
@@ -41,7 +42,7 @@ if (isset($_POST['submit'])) {
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Log in</title>
+    <title>Log in - Fry Me To The Moon</title>
     <link rel="icon" href="../lib/assets/strawberry.png" />
     <link href="../lib/css/output.css" rel="stylesheet" />
 </head>
@@ -55,7 +56,7 @@ if (isset($_POST['submit'])) {
             <p class="text-red-500"><?php echo $error ?></p>
 
             <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" class="flex flex-col gap-2">
-                <input class="text-input" type="email" name="email" placeholder="Enter your email" required autofocus>
+                <input class="text-input" type="email" name="email" placeholder="Enter your email" value="<?= $email ?? "" ?>" required autofocus>
 
                 <input class="text-input" type="password" name="password" placeholder="Enter your password" required>
 

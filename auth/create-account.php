@@ -55,7 +55,7 @@ function validateAll($name, $email, $password)
 <html>
 
 <head>
-    <title>Create account</title>
+    <title>Create Account - Fry My To The Moon</title>
     <link rel="icon" href="../lib/assets/strawberry.png" />
     <link href="../lib/css/output.css" rel="stylesheet" />
 </head>
@@ -69,9 +69,9 @@ function validateAll($name, $email, $password)
             <p class="text-red-500"><?php echo $error ?></p>
 
             <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" class="flex flex-col gap-2">
-                <input class="text-input" type="text" name="name" placeholder="Enter your name" required autofocus>
+                <input class="text-input" type="text" name="name" placeholder="Enter your name" value="<?= $name ?? '' ?>" required autofocus>
 
-                <input class="text-input" type="email" name="email" placeholder="Enter your email" required>
+                <input class="text-input" type="email" name="email" placeholder="Enter your email" value="<?= $email ?? '' ?>" required>
 
                 <input class="text-input" type="password" name="password" placeholder="Enter your password" required minlength="5">
 

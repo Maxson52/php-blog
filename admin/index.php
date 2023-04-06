@@ -235,7 +235,9 @@ $categories = mysqli_query($conn, $categoriesQuery) or die("Query failed: " . my
 
             <!-- Create pie chart of post category -->
             <h3 class="mt-4 h3">Posts By Category</h3>
-            <canvas id="myChart3" width="500" height="200"></canvas>
+            <div class="w-auto h-[36rem]">
+                <canvas id="myChart3" width="500" height="200"></canvas>
+            </div>
             <script>
                 let ctx3 = document.getElementById('myChart3').getContext('2d');
                 let myChart3 = new Chart(ctx3, {
