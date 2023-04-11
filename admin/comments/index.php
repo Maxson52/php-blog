@@ -27,6 +27,7 @@ $query = "SELECT comments.id, comments.content, comments.visible, comments.creat
           FROM comments 
           JOIN users ON comments.author_id = users.id 
           JOIN posts ON comments.post_id = posts.id 
+        WHERE (comments.content LIKE '%$search%' OR users.name LIKE '%$search%')
           ORDER BY $orderBy $sortOrder";
 $dbRes = mysqli_query($conn, $query) or die("Query failed: " . mysqli_error($conn));
 $res = [];
